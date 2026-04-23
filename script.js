@@ -2641,22 +2641,19 @@ async function generarPlaneacion(nivel) {
   preview.classList.remove("visible");
   preview.innerHTML = "";
 
-  // Llamada real a la API de Claude
+  // Llamada a la Cloud Function de Firebase (nunca expone la API key)
+  // Reemplaza TU_REGION con tu región, ej: us-central1
+  const FUNCTION_URL = "/api/generar";
+
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch(FUNCTION_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }],
-      }),
+      body: JSON.stringify({ prompt }),
     });
     if (!response.ok) throw new Error("API error " + response.status);
     const data = await response.json();
-    let raw = (data.content?.[0]?.text || "").trim();
-    raw = raw.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, "$1").trim();
-    const plan = JSON.parse(raw);
+    const plan = data.plan;
     spinner.classList.remove("visible");
     renderPreview(nivel, plan, {
       docente,
