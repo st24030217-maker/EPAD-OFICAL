@@ -2641,19 +2641,28 @@ async function generarPlaneacion(nivel) {
   preview.classList.remove("visible");
   preview.innerHTML = "";
 
-  // Llamada a la Cloud Function de Firebase (nunca expone la API key)
-  // Reemplaza TU_REGION con tu región, ej: us-central1
-  const FUNCTION_URL = "/api/generar";
+  // Llamada directa a Gemini API
+  const GEMINI_KEY = "AIzaSyB00NGSoKpElw2hnr7QQuiHvWIwx6ZZKbs";
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
   try {
-    const response = await fetch(FUNCTION_URL, {
+    const response = await fetch(GEMINI_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 },
+      }),
     });
     if (!response.ok) throw new Error("API error " + response.status);
     const data = await response.json();
-    const plan = data.plan;
+    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    raw = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/```$/, "")
+      .trim();
+    raw = raw.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, "$1").trim();
+    const plan = JSON.parse(raw);
     spinner.classList.remove("visible");
     renderPreview(nivel, plan, {
       docente,
