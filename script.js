@@ -2641,10 +2641,6 @@ async function generarPlaneacion(nivel) {
   preview.classList.remove("visible");
   preview.innerHTML = "";
 
-  // Llamada directa a Gemini API
-  const GEMINI_KEY = "AIzaSyB00NGSoKpElw2hnr7QQuiHvWIwx6ZZKbs";
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
-
   try {
     const response = await fetch(GEMINI_URL, {
       method: "POST",
@@ -2821,4 +2817,123 @@ function imprimirPlaneacion(nivel) {
   win.document.write(htmlContent);
   win.document.close();
   setTimeout(() => win.print(), 500);
+}
+// ============================================================
+//  EPAD — Conexión segura a Gemini vía backend proxy
+// ============================================================
+
+const BACKEND_URL = "https://epad-backend-production.up.railway.app";
+
+async function generarPlaneacion(nivel) {
+  if (!checkPlaneacionesAccess()) {
+    document
+      .getElementById("planeaciones")
+      .scrollIntoView({ behavior: "smooth" });
+    showToast(
+      "⚠ Crea una cuenta o suscríbete para generar planeaciones con IA.",
+    );
+    return;
+  }
+
+  const prefix = PREFIX[nivel];
+  const matKey = selectedMateria[nivel];
+  if (!matKey) {
+    alert("Por favor selecciona una materia primero.");
+    return;
+  }
+
+  const matInfo = MATERIAS_INFO[matKey];
+  const docente =
+    document.getElementById(prefix + "-docente").value.trim() || "Docente";
+  const grado = document.getElementById(prefix + "-grado").value.trim() || "—";
+  const ciclo =
+    document.getElementById(prefix + "-ciclo").value.trim() || "2025–2026";
+  const periodo =
+    document.getElementById(prefix + "-periodo").value.trim() || "—";
+  const proposito = document.getElementById(prefix + "-proposito").value.trim();
+  const evalTipo = document.getElementById(prefix + "-eval-tipo").value;
+  const evalInst = document.getElementById(prefix + "-eval-inst").value.trim();
+  const adecuaciones = document
+    .getElementById(prefix + "-adecuaciones")
+    .value.trim();
+  const notas = document.getElementById(prefix + "-notas").value.trim();
+
+  const camposRows = document.querySelectorAll(
+    "#campos-" + nivel + " .campo-row",
+  );
+  const actividades = [];
+  camposRows.forEach((row) => {
+    const act = { momento: "", tiempo: "", descripcion: "", recursos: "" };
+    row.querySelectorAll("input, textarea, select").forEach((el) => {
+      if (el.tagName === "SELECT") act.momento = el.value;
+      else if (el.id?.includes("-tiempo")) act.tiempo = el.value;
+      else if (el.tagName === "TEXTAREA") act.descripcion = el.value;
+      else if (el.id?.includes("-rec")) act.recursos = el.value;
+    });
+    if (act.descripcion || act.momento) actividades.push(act);
+  });
+
+  const nLabel = NIVEL_LABELS[nivel];
+  const prompt = `
+Genera una planeación didáctica profesional y completa en español para:
+- Nivel educativo: ${nLabel}
+- Campo formativo / Materia: ${matInfo.icon} ${matInfo.name}
+- Grado / Grupo: ${grado}
+- Docente: ${docente}
+- Ciclo escolar: ${ciclo} | Período: ${periodo}
+- Propósito: ${proposito || "Desarrollar competencias acordes al campo formativo"}
+- Actividades: ${JSON.stringify(actividades)}
+- Evaluación: ${evalTipo} / ${evalInst || "por definir"}
+- Adecuaciones: ${adecuaciones || "Ninguna"}
+- Notas: ${notas || "Ninguna"}
+`.trim();
+
+  const spinner = document.getElementById("spinner-" + nivel);
+  const preview = document.getElementById("preview-" + nivel);
+  spinner.classList.add("visible");
+  preview.classList.remove("visible");
+  preview.innerHTML = "";
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/planeacion`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(
+        errData.error || `Error del servidor (${response.status})`,
+      );
+    }
+
+    const data = await response.json();
+    if (!data.success || !data.planeacion)
+      throw new Error("Respuesta inesperada.");
+
+    spinner.classList.remove("visible");
+    renderPreview(nivel, data.planeacion, {
+      docente,
+      grado,
+      ciclo,
+      periodo,
+      matInfo,
+      nLabel,
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    spinner.classList.remove("visible");
+    preview.classList.add("visible");
+    preview.innerHTML = `
+      <div style="background:#fff0f0;border:1.5px solid #e53935;border-radius:12px;padding:28px 24px;text-align:center;color:#b71c1c;">
+        <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
+        <div style="font-weight:700;font-size:16px;margin-bottom:8px;">No se pudo generar la planeación</div>
+        <div style="font-size:13px;margin-bottom:18px;">${err.message}</div>
+        <button onclick="generarPlaneacion('${nivel}')"
+          style="background:#e53935;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;">
+          🔄 Reintentar
+        </button>
+      </div>`;
+  }
 }
