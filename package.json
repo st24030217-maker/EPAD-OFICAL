@@ -1,4 +1,7 @@
 {
+  "name": "epad-ofical",
+  "version": "1.0.0",
+  "private": true,
   "dependencies": {
     "ogl": "^1.0.11"
   }
