@@ -1,8 +1,6 @@
 // api/generar-planeacion.js
+// Usa Groq (Llama 3.3) en lugar de Gemini — la API key vive en Vercel env vars
 
-// System Instruction: define la "personalidad pedagógica" de Gemini.
-// Va separado del prompt del usuario para seguir las mejores prácticas
-// de la API: el system instruction es estático y se reutiliza en cada llamada.
 const SYSTEM_INSTRUCTION = `
 Eres un experto en didáctica y diseño curricular del sistema educativo mexicano,
 especializado en el Plan de Estudios 2022 de la Nueva Escuela Mexicana (NEM).
@@ -12,124 +10,127 @@ REGLA CRÍTICA: Responde ÚNICAMENTE con el JSON solicitado. Sin texto adicional
 sin bloques markdown, sin explicaciones fuera del JSON.
 `.trim();
 
-// Esta función es la que Vercel ejecuta cuando alguien llama al endpoint.
-// req = lo que manda el navegador | res = lo que devuelves tú
 export default async function handler(req, res) {
-  // 1. Solo aceptar POST (si alguien entra directo al URL desde el browser, lo bloqueamos)
+  // 1. Solo POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  // 2. Extraer los datos que mandó el formulario
-  const { nivel, materia, payload } = req.body;
-  if (!nivel || !materia || !payload) {
+  // 2. Extraer el prompt
+  const { prompt } = req.body;
+  if (!prompt) {
     return res.status(400).json({ error: "Faltan parámetros" });
   }
 
-  // 3. Construir el prompt dinámico con los datos del docente
-  const userPrompt = buildPrompt(nivel, materia, payload);
+  // 3. Validar Token de Firebase
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No autorizado. Token requerido." });
+  }
+  const idToken = authHeader.split("Bearer ")[1];
 
   try {
-    // 4. Llamar a Gemini — la API Key viene de las variables de entorno de Vercel
-    //    process.env.GEMINI_API_KEY nunca llega al navegador
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    // 4. Verificar el token con Firebase Auth REST API
+    const FIREBASE_API_KEY = "AIzaSyBn_s9pZ2hiKvcldj370DwUxtQdZFDQsUM";
+    const PROJECT_ID = "epad-10bea";
+
+    const verifyRes = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      },
+    );
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || !verifyData.users?.length) {
+      return res.status(401).json({ error: "Token inválido o expirado." });
+    }
+    const uid = verifyData.users[0].localId;
+
+    // 5. Verificar suscripción en Firestore
+    const firestoreRes = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/suscripciones/${uid}`,
+      { headers: { Authorization: `Bearer ${idToken}` } },
+    );
+    const firestoreData = await firestoreRes.json();
+
+    if (!firestoreRes.ok || !firestoreData.fields) {
+      return res
+        .status(403)
+        .json({ error: "No se encontró una suscripción válida." });
+    }
+
+    const estado = firestoreData.fields.estado?.stringValue;
+    if (estado !== "activa" && estado !== "trial") {
+      return res
+        .status(403)
+        .json({ error: "Suscripción inactiva o expirada." });
+    }
+
+    if (estado === "trial") {
+      const trialFinStr = firestoreData.fields.trial_fin?.timestampValue;
+      if (!trialFinStr || new Date(trialFinStr) < new Date()) {
+        return res
+          .status(403)
+          .json({ error: "Tu periodo de prueba ha finalizado." });
+      }
+    }
+  } catch (err) {
+    console.error("Error validando token o suscripción:", err.message);
+    return res
+      .status(500)
+      .json({ error: "Error interno al validar autorización." });
+  }
+
+  try {
+    // 6. Llamar a Groq — la API key viene de las variables de entorno de Vercel
+    const groqRes = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM_INSTRUCTION }],
-          },
-          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-          generationConfig: {
-            temperature: 0.75, // 0 = muy literal | 1 = muy creativo
-            maxOutputTokens: 2000, // suficiente para una planeación completa
-          },
+          model: "llama-3.3-70b-versatile",
+          max_tokens: 2000,
+          temperature: 0.7,
+          messages: [
+            { role: "system", content: SYSTEM_INSTRUCTION },
+            { role: "user", content: prompt },
+          ],
         }),
       },
     );
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Gemini respondió con error:", errText);
-      return res.status(502).json({ error: "Error al contactar Gemini" });
+    if (!groqRes.ok) {
+      const errData = await groqRes.json().catch(() => ({}));
+      console.error("Groq error:", errData);
+      return res.status(502).json({ error: "Error al contactar Groq" });
     }
 
-    // 5. Extraer el texto de la respuesta de Gemini
-    const data = await response.json();
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    // 7. Extraer el texto de la respuesta
+    const data = await groqRes.json();
+    let raw = data.choices?.[0]?.message?.content || "{}";
 
-    // 6. Limpiar: Gemini a veces envuelve el JSON en bloques ```json ... ```
+    // 8. Limpiar posibles bloques markdown
     raw = raw
       .replace(/^```json\s*/i, "")
       .replace(/```$/, "")
       .trim();
 
-    // 7. Extraer solo el objeto JSON aunque venga con texto alrededor
+    // 9. Extraer el JSON aunque venga con texto alrededor
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("La respuesta no contiene JSON válido");
 
     const plan = JSON.parse(match[0]);
 
-    // 8. Devolver el plan al navegador
+    // 10. Devolver al navegador
     return res.status(200).json({ ok: true, plan });
   } catch (err) {
     console.error("Error interno:", err.message);
     return res.status(500).json({ error: err.message });
   }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// buildPrompt: construye el mensaje específico del docente para esta sesión.
-// Separarlo del system instruction permite reutilizar la "personalidad" del
-// modelo sin repetirla en cada llamada.
-// ─────────────────────────────────────────────────────────────────────────────
-function buildPrompt(nivel, materia, p) {
-  const acts =
-    (p.actividades || [])
-      .map(
-        (a, i) =>
-          `  ${i + 1}. [${a.momento}] (${a.tiempo || "—"}): ${a.descripcion || "sin descripción"} — Recursos: ${a.recursos || "no especificados"}`,
-      )
-      .join("\n") ||
-    "  (Genera una secuencia completa apropiada al nivel y campo)";
-
-  return `
-Genera una planeación didáctica con estos datos:
-
-- Nivel educativo: ${nivel}
-- Campo formativo / Materia: ${materia}
-- Docente: ${p.docente || "No especificado"}
-- Grado / Grupo: ${p.grado || "No especificado"}
-- Ciclo escolar: ${p.ciclo || "2025-2026"}
-- Período: ${p.periodo || "No especificado"}
-
-PROPÓSITO DEL DOCENTE:
-${p.proposito || "Desarrollar aprendizajes pertinentes al campo formativo."}
-
-ACTIVIDADES QUE YA PLANEÓ EL DOCENTE:
-${acts}
-
-EVALUACIÓN: ${p.evalTipo || "Observación directa"} / ${p.evalInst || "Por definir"}
-ADECUACIONES: ${p.adecuaciones || "Sugiere adecuaciones inclusivas generales"}
-NOTAS DEL DOCENTE: ${p.notas || "Ninguna"}
-
-Responde ÚNICAMENTE con este JSON:
-{
-  "proposito_enriquecido": "string",
-  "ejes_articuladores": ["string", "string"],
-  "secuencia": [
-    {"momento":"Inicio",     "tiempo":"20 min","actividad":"string","recursos":"string"},
-    {"momento":"Desarrollo", "tiempo":"40 min","actividad":"string","recursos":"string"},
-    {"momento":"Cierre",     "tiempo":"20 min","actividad":"string","recursos":"string"}
-  ],
-  "evaluacion": {
-    "tipo": "string",
-    "instrumento": "string",
-    "indicadores": ["string","string","string"]
-  },
-  "adecuaciones_sugeridas": "string",
-  "reflexion_docente": "string"
-}`.trim();
 }

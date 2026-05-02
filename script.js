@@ -2514,7 +2514,6 @@ function exportarExcel(nivel) {
 //  EPAD — Generación de planeaciones con Groq (Llama 3.3)
 // ============================================================
 
-const GROQ_API_KEY_PLAN = process.env.GROQ_API_KEY || "";
 const GROQ_MODEL_PLAN = "llama-3.3-70b-versatile";
 
 async function generarPlaneacion(nivel) {
@@ -2677,25 +2676,17 @@ Genera ÚNICAMENTE un objeto JSON válido con esta estructura exacta. Sin texto 
   "reflexion_docente": "string"
 }`;
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${GROQ_API_KEY_PLAN}`,
-        },
-        body: JSON.stringify({
-          model: GROQ_MODEL_PLAN,
-          max_tokens: 2000,
-          temperature: 0.5,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt },
-          ],
-        }),
-      },
-    );
+    const response = await fetch("/api/groq-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: GROQ_MODEL_PLAN,
+        max_tokens: 2000,
+        temperature: 0.5,
+        system: systemPrompt,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));

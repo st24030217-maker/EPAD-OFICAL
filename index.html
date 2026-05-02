@@ -6164,7 +6164,6 @@
        CHAT IA GROQ — ASISTENTE EPAD
     ============================================= */
     (function() {
-      const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
       const GROQ_MODEL   = 'llama-3.3-70b-versatile';
       const WA_NUMBER    = '528719164677';
 
@@ -6283,20 +6282,15 @@ INSTRUCCIONES DE RESPUESTA:
         showTyping();
 
         try {
-          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          const response = await fetch('/api/groq-chat', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${GROQ_API_KEY}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: GROQ_MODEL,
               max_tokens: 350,
               temperature: 0.65,
-              messages: [
-                { role: 'system', content: SYSTEM_PROMPT },
-                ...chatHistory
-              ]
+              system: SYSTEM_PROMPT,
+              messages: chatHistory
             })
           });
 
