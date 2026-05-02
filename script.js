@@ -103,88 +103,7 @@ window.addEventListener("scroll", () => {
 // ============================================================
 // COURSES DATA
 // ============================================================
-const PUBLIC_COURSES = [
-  {
-    id: 1,
-    name: "Cuadernillo USICAMM 2026",
-    desc: "Material de estudio impreso y digital con los temas clave del proceso USICAMM 2026. Elaborado por la Profa. Roc\u00EDo, El Crack, el Profe Paco R\u00EDos y la Mtra. Azalhia.",
-    cat: "usicamm",
-    catLabel: "USICAMM 2026",
-    hours: "Autoaprendizaje",
-    students: "\u2014",
-    rating: "5.0",
-    price: "Consultar",
-    badge: "",
-    color: "linear-gradient(135deg,#1a3a5c,#2563a8)",
-    icon: "CUA",
-  },
-  {
-    id: 2,
-    name: "Simulador USICAMM 2026",
-    desc: "Practica con simulacros reales del examen USICAMM. Reactivos actualizados, tiempo cronometrado y retroalimentaci\u00F3n inmediata para medir tu avance.",
-    cat: "usicamm",
-    catLabel: "USICAMM 2026",
-    hours: "A tu ritmo",
-    students: "\u2014",
-    rating: "5.0",
-    price: "Consultar",
-    badge: "hot",
-    color: "linear-gradient(135deg,#c8952a,#e8b84b)",
-    icon: "SIM",
-  },
-  {
-    id: 3,
-    name: "Plataforma de Estudio USICAMM 2026",
-    desc: "Acceso completo a la plataforma web con contenido estructurado, videos, materiales descargables y seguimiento de tu progreso en tiempo real.",
-    cat: "usicamm",
-    catLabel: "USICAMM 2026",
-    hours: "Acceso de por vida",
-    students: "\u2014",
-    rating: "5.0",
-    price: "Consultar",
-    badge: "new",
-    color: "linear-gradient(135deg,#1e6b45,#27ae60)",
-    icon: "PLA",
-  },
-  {
-    id: 4,
-    name: "Plan Completo con Acompa\u00F1amiento USICAMM 2026",
-    desc: "Todo lo que necesitas en un solo plan: Cuadernillo + Simulador + Plataforma web + Sesiones en vivo + Resoluci\u00F3n de dudas durante todo tu proceso. La opci\u00F3n m\u00E1s completa.",
-    cat: "usicamm",
-    catLabel: "USICAMM 2026",
-    hours: "Sesiones en vivo incluidas",
-    students: "\u2014",
-    rating: "5.0",
-    price: "$1,499",
-    oldPrice: "$3,000",
-    badge: "top",
-    color: "linear-gradient(135deg,#7c3aed,#a855f7)",
-    icon: "COM",
-  },
-  {
-    id: 5,
-    name: "Acompa\u00F1amiento a la Promoci\u00F3n Vertical 2026",
-    desc: "El camino a tu Direcci\u00F3n o Supervisi\u00F3n empieza aqu\u00ED. Domina el proceso de Promoci\u00F3n Vertical 2026 con EPAD. Incluye aspectos normativos, gesti\u00F3n escolar y v\u00EDnculo con la comunidad.",
-    cat: "usicamm",
-    catLabel: "USICAMM 2026",
-    hours: "Inicia 27 Abr 2026",
-    students: "\u2014",
-    rating: "5.0",
-    price: "$199 MXN",
-    oldPrice: "$799 MXN",
-    badge: "hot",
-    color: "linear-gradient(135deg,#0a4a7a,#1a7abf)",
-    icon: "AEP",
-    recursos: [
-      "Audio tipo podcast",
-      "Grupo de WhatsApp",
-      "Videos explicativos",
-      "Res\u00FAmenes",
-      "Presentaciones",
-      "Simuladores",
-    ],
-  },
-];
+// Datos trasladados a js/data.js
 let COURSES = [];
 let courseIdCounter = PUBLIC_COURSES.length + 1;
 let currentFilter = "todos";
@@ -202,6 +121,12 @@ function filterCourses(cat, btn) {
   }
   if (activeBtn) {
     activeBtn.classList.add("active");
+  } else {
+    // Fallback: activar el botón "Todos" si no se encuentra ninguno
+    const todosBtn = Array.from(document.querySelectorAll(".filter-btn")).find(
+      (b) => b.getAttribute("onclick")?.includes("filterCourses('todos'"),
+    );
+    if (todosBtn) todosBtn.classList.add("active");
   }
   renderCourses();
 }
@@ -220,28 +145,28 @@ function renderCourses() {
       return;
     }
     const badgeLabels = {
-      hot: "&#9733; Popular",
+      hot: "<i data-lucide='star' style='width:14px;height:14px;fill:currentColor'></i> Popular",
       new: "+ Nuevo",
-      top: "&#9670; Top",
+      top: "<i data-lucide='award' style='width:14px;height:14px'></i> Top",
     };
     grid.innerHTML = allCourses
       .map(
         (c) => `
                   <div class="course-card" onclick="openModal(${c.id})">
-                    <div class="course-thumb" style="background:${c.color};">
+                    <div class="course-thumb" style='background:${c.color};'>
                       ${c.badge ? `<div class="course-badge ${c.badge}">${badgeLabels[c.badge] || c.badge}</div>` : ""}
-                      <div class="course-thumb-icon" style="font-family:'Merriweather',serif;font-weight:700;font-size:32px;color:#fff;letter-spacing:1px;">${c.icon}</div>
+                      <div class="course-thumb-icon" style='font-family:'Merriweather',serif;font-weight:700;font-size:32px;color:#fff;letter-spacing:1px;'>${c.icon}</div>
                     </div>
                     <div class="course-body">
-                      <div class="course-cat" style="color:var(--accent);">${c.catLabel || c.cat || ""}</div>
+                      <div class="course-cat" style='color:var(--accent);'>${c.catLabel || c.cat || ""}</div>
                       <div class="course-name">${c.name.replace(/\x60/g, "\\`")}</div>
                       <div class="course-desc">${c.desc.replace(/\x60/g, "\\`")}</div>
-                      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;">
+                      <div style='display:flex;align-items:center;justify-content:space-between;margin-top:auto;'>
                         <div>
-                          <span style="font-size:16px;font-weight:700;color:var(--primary);">${c.price.replace(/\x60/g, "\\`")}</span>
-                          ${c.oldPrice ? `<span style="font-size:13px;color:var(--text-muted);text-decoration:line-through;margin-left:8px;">${c.oldPrice.replace(/\x60/g, "\\`")}</span>` : ""}
+                          <span style='font-size:16px;font-weight:700;color:var(--primary);'>${c.price.replace(/\x60/g, "\\`")}</span>
+                          ${c.oldPrice ? `<span style='font-size:13px;color:var(--text-muted);text-decoration:line-through;margin-left:8px;'>${c.oldPrice.replace(/\x60/g, "\\`")}</span>` : ""}
                         </div>
-                        <span style="font-size:11px;color:var(--text-muted);">\u23F1 ${c.hours}</span>
+                        <span style='font-size:11px;color:var(--text-muted);'>\u23F1 ${c.hours}</span>
                       </div>
                     </div>
                   </div>`,
@@ -255,51 +180,7 @@ function renderCourses() {
 // ============================================================
 // TESTIMONIALS
 // ============================================================
-const TESTIMONIALS = [
-  {
-    text: "El simulador de EPAD me ayud\u00F3 a prepararme con confianza. Aprob\u00E9 el examen USICAMM a la primera. \u00A1Totalmente recomendado!",
-    author: "Mar\u00EDa G.",
-    role: "Docente de Primaria",
-    stars: 5,
-    color: "#1a3a5c",
-  },
-  {
-    text: "Los materiales est\u00E1n muy bien estructurados y la atenci\u00F3n del equipo es excepcional. Vale cada peso invertido.",
-    author: "Carlos R.",
-    role: "Maestro de Secundaria",
-    stars: 5,
-    color: "#c8952a",
-  },
-  {
-    text: "Gracias a las planeaciones y recursos de EPAD pude organizarme mejor y obtener mejores resultados en mi grupo.",
-    author: "Ana L.",
-    role: "Maestra de Preescolar",
-    stars: 5,
-    color: "#1e6b45",
-  },
-  {
-    text: "El acompa\u00F1amiento personalizado marc\u00F3 la diferencia. Sent\u00ED apoyo real en cada etapa del proceso.",
-    author: "Roberto M.",
-    role: "Docente de Bachillerato",
-    stars: 5,
-    color: "#7c3aed",
-  },
-  {
-    text: "Excelente plataforma, muy intuitiva y completa. El contenido es claro y actualizado. Lo recomiendo al 100%.",
-    author: "Laura P.",
-    role: "Profesora de Telesecundaria",
-    stars: 5,
-    color: "#0a4a7a",
-  },
-  {
-    text: "Con el cuadernillo y los simuladores logr\u00E9 superar mis expectativas. Un equipo que de verdad sabe de educaci\u00F3n.",
-    author: "Diego S.",
-    role: "Docente de Primaria",
-    stars: 5,
-    color: "#b22222",
-  },
-];
-
+// Testimonios trasladados a js/data.js
 function renderTestimonials() {
   try {
     const grid = document.getElementById("testimonials-grid");
@@ -313,13 +194,13 @@ function renderTestimonials() {
                     <div class="testimonial-stars">${"\u2605".repeat(t.stars)}</div>
                     <div class="testimonial-text">"${t.text}"</div>
                     <div class="testimonial-author">
-                      <div class="t-avatar" style="background:${t.color};">${t.author
+                      <div class="t-avatar" style='background:${t.color};'>${t.author
                         .split(" ")
                         .map((w) => w[0])
                         .join("")}</div>
                       <div>
-                        <div style="font-weight:600;font-size:13px;color:var(--text);">${t.author}</div>
-                        <div style="font-size:12px;color:var(--text-muted);">${t.role}</div>
+                        <div style='font-weight:600;font-size:13px;color:var(--text);'>${t.author}</div>
+                        <div style='font-size:12px;color:var(--text-muted);'>${t.role}</div>
                       </div>
                     </div>
                   </div>`,
@@ -344,16 +225,17 @@ function openModal(id) {
 }
 
 function showStep1(c) {
+  const isConsultar = c.price === "Consultar";
   document.getElementById("modal-body").innerHTML = `
                 <div class="modal-course-info">
-                  <div class="modal-course-thumb" style="background:${c.color}">${c.icon}</div>
+                  <div class="modal-course-thumb" style='background:${c.color}'>${c.icon}</div>
                   <div>
                     <div class="modal-course-name">${c.name.replace(/\x60/g, "\\`")}</div>
                     <div class="modal-course-price">${c.price.replace(/\x60/g, "\\`")} \u00B7 ${c.hours} \u00B7 Calif. ${c.rating}</div>
                   </div>
                 </div>
                 ${
-                  c.price !== "Gratis"
+                  !isConsultar && c.price !== "Gratis"
                     ? `
                 <div class="pay-steps">
                   <div class="pay-step active"><div class="step-circle">1</div><div class="step-label">Datos</div></div>
@@ -362,8 +244,17 @@ function showStep1(c) {
                 </div>`
                     : ""
                 }
+                ${
+                  isConsultar
+                    ? `
+                <div class="modal-title">Consultar precio</div>
+                <div class="modal-sub">Completa tus datos y un asesor te contactar\u00E1 con el precio y disponibilidad.</div>
+                `
+                    : `
                 <div class="modal-title">${c.price === "Gratis" ? "Inscripci\u00F3n gratuita" : "Datos de inscripci\u00F3n"}</div>
                 <div class="modal-sub">Complete sus datos para ${c.price === "Gratis" ? "acceder al curso" : "continuar al pago"}.</div>
+                `
+                }
                 <div class="form-row">
                   <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" placeholder="Tu nombre" id="f-nombre"></div>
                   <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" placeholder="Tu apellido" id="f-apellido"></div>
@@ -373,9 +264,28 @@ function showStep1(c) {
                 <div class="form-group"><label class="form-label">\u00BFC\u00F3mo nos conociste?</label>
                   <select class="form-input" id="f-como"><option value="">Selecciona una opci\u00F3n</option><option>Redes sociales</option><option>Google</option><option>Recomendaci\u00F3n</option><option>Otro</option></select>
                 </div>
-                <button class="btn-submit" onclick="${c.price === "Gratis" ? `submitFree("${c.name.replace(/\x60/g, "\\`").replace(/"/g, '\\"')}")` : "goStep2()"}">
-                  ${c.price === "Gratis" ? "Inscribirme gratis \u2192" : "Continuar al pago \u2192"}
+                <button class="btn-submit" onclick="${
+                  isConsultar
+                    ? `consultarPrecioWhatsApp('${c.name.replace(/'/g, "\\'")}')`
+                    : c.price === "Gratis"
+                      ? `submitFree("${c.name.replace(/\x60/g, "\\`").replace(/"/g, '\\"')}")`
+                      : "goStep2()"
+                }">
+                  ${isConsultar ? "\uD83D\uDCAC Consultar por WhatsApp \u2192" : c.price === "Gratis" ? "Inscribirme gratis \u2192" : "Continuar al pago \u2192"}
                 </button>`;
+}
+
+function consultarPrecioWhatsApp(curso) {
+  const nombre = document.getElementById("f-nombre")?.value.trim() || "";
+  const email = document.getElementById("f-email")?.value.trim() || "";
+  if (!nombre || !email) {
+    alert("Por favor completa tu nombre y correo para continuar.");
+    return;
+  }
+  const msg = encodeURIComponent(
+    `Hola, me interesa el curso *${curso}* y quiero conocer el precio y disponibilidad.\n\nMi nombre es: ${nombre}\nMi correo: ${email}\n\n¡Gracias!`,
+  );
+  window.open("https://wa.me/528719164677?text=" + msg, "_blank");
 }
 
 function goStep2() {
@@ -395,7 +305,7 @@ function goStep2() {
   const c = currentCourse;
   document.getElementById("modal-body").innerHTML = `
                 <div class="modal-course-info">
-                  <div class="modal-course-thumb" style="background:${c.color}">${c.icon}</div>
+                  <div class="modal-course-thumb" style='background:${c.color}'>${c.icon}</div>
                   <div><div class="modal-course-name">${c.name.replace(/\x60/g, "\\`")}</div><div class="modal-course-price">${c.price.replace(/\x60/g, "\\`")} \u00B7 ${c.hours}</div></div>
                 </div>
                 <div class="pay-steps">
@@ -406,24 +316,43 @@ function goStep2() {
                 <div class="modal-title">Informaci\u00F3n de pago</div>
                 <div class="modal-sub">Realiza tu pago por transferencia o dep\u00F3sito y env\u00EDanos tu comprobante por WhatsApp.</div>
 
-                <div style="background:#f0f7ff;border:1px solid #bdd6f5;border-radius:10px;padding:18px 20px;margin:16px 0;">
-                  <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary);margin-bottom:12px;">&#9673; Beneficiario</div>
-                  <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;">H\u00E9ctor Orrante Sustaita</div>
-                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Los datos de cuenta (CLABE / No. de tarjeta) te ser\u00E1n enviados de forma privada por WhatsApp por uno de nuestros asesores.</div>
+                <div style='background:#f0f7ff;border:1px solid #bdd6f5;border-radius:10px;padding:18px 20px;margin:16px 0;'>
+                  <div style='font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--primary);margin-bottom:12px;'>&#9673; Beneficiario</div>
+                  <div style='font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;'>H\u00E9ctor Orrante Sustaita</div>
+                  <div style='font-size:12px;color:var(--text-muted);margin-bottom:6px;'>Los datos de cuenta (CLABE / No. de tarjeta) te ser\u00E1n enviados de forma privada por WhatsApp por uno de nuestros asesores.</div>
                 </div>
 
-                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+                <div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between'>
                   <div>
-                    <div style="font-size:13px;font-weight:600;color:var(--success)">Total a pagar</div>
-                    <div style="font-size:22px;font-weight:800;color:var(--primary);font-family:'Merriweather',serif">${c.price.replace(/\x60/g, "\\`")}</div>
+                    <div style='font-size:13px;font-weight:600;color:var(--success)'>Total a pagar</div>
+                    <div style='font-size:22px;font-weight:800;color:var(--primary);font-family:'Merriweather',serif'>${c.price.replace(/\x60/g, "\\`")}</div>
                   </div>
-                  <div style="text-align:right;font-size:11px;color:var(--text-muted)">Pago \u00FAnico<br>Acceso de por vida</div>
+                  <div style='text-align:right;font-size:11px;color:var(--text-muted)'>Pago \u00FAnico<br>Acceso de por vida</div>
                 </div>
 
                 <button class="btn-pay" style="margin-top:4px;background:#25d366;border-color:#25d366;" onclick="solicitarDatosPago('${c.name}','${c.price}')">
                   &#9635; Solicitar datos de pago por WhatsApp
                 </button>
-                <div style="text-align:center;margin-top:10px"><button class="btn-back" onclick="showStep1(currentCourse)">\u2190 Volver a datos</button></div>`;
+
+                <div style='margin:18px 0 0 0;border-top:1px solid var(--border);padding-top:18px;'>
+                  <div style='font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;text-align:center;'>¿Ya realizaste tu transferencia?</div>
+                  <div style='background:#fffbea;border:1px solid #f6d860;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:12px;color:#7a6000;'>
+                    <strong>Pasos:</strong><br>
+                    1. Solicita tus datos bancarios por WhatsApp<br>
+                    2. Realiza tu transferencia o depósito<br>
+                    3. Envía tu comprobante al asesor por WhatsApp<br>
+                    4. Haz clic en el botón de abajo para registrar tu solicitud
+                  </div>
+                  <div class="form-group" style='margin-bottom:10px;'>
+                    <label class="form-label">Número de referencia / folio (opcional)</label>
+                    <input class="form-input" id="f-referencia" placeholder="Ej. 123456789 o REF-XYZ" />
+                  </div>
+                  <button class="btn-pay" style="margin-top:4px;background:linear-gradient(135deg,var(--accent),var(--accent-light));border-color:var(--accent);color:#1a2a3a;" onclick="goStep3()">
+                    ✓ Ya realicé mi pago — Confirmar inscripción
+                  </button>
+                </div>
+
+                <div style='text-align:center;margin-top:10px'><button class="btn-back" onclick="showStep1(currentCourse)">\u2190 Volver a datos</button></div>`;
 }
 
 function solicitarDatosPago(curso, precio) {
@@ -434,8 +363,27 @@ function solicitarDatosPago(curso, precio) {
   window.open("https://wa.me/528719164677?text=" + msg, "_blank");
 }
 
+function goStep3() {
+  const referencia =
+    document.getElementById("f-referencia")?.value.trim() || "";
+  enrollData.referencia = referencia;
+  // Enviar notificación por WhatsApp al asesor con los datos del comprobante
+  const c = currentCourse;
+  const nombre = enrollData.nombre || "";
+  const email = enrollData.email || "";
+  const tel = enrollData.tel || "No proporcionado";
+  const msg = encodeURIComponent(
+    `✅ *NUEVO PAGO REGISTRADO — EPAD*\n\n📚 Curso: *${c.name}*\n💰 Monto: ${c.price}\n\n👤 Alumno: ${nombre} ${enrollData.apellido || ""}\n📧 Email: ${email}\n📱 Tel: ${tel}${referencia ? `\n🔖 Referencia: ${referencia}` : ""}\n\n_El alumno indica que ya realizó su transferencia. Favor de verificar y enviar accesos._`,
+  );
+  window.open("https://wa.me/528719164677?text=" + msg, "_blank");
+  showPaymentSuccess();
+}
+
 function showPaymentSuccess() {
   const c = currentCourse;
+  const referencia = enrollData.referencia || "";
+  const folioId =
+    "EPAD-" + Math.random().toString(36).substring(2, 8).toUpperCase();
   document.getElementById("modal-body").innerHTML = `
                 <div class="pay-steps">
                   <div class="pay-step done"><div class="step-circle">\u2713</div><div class="step-label">Datos</div></div>
@@ -443,18 +391,24 @@ function showPaymentSuccess() {
                   <div class="pay-step active"><div class="step-circle">\u2713</div><div class="step-label">Confirmaci\u00F3n</div></div>
                 </div>
                 <div class="success-msg">
-                  <div class="success-icon">&#10003;</div>
-                  <div class="success-title">\u00A1Pago exitoso!</div>
+                  <div class="success-icon"><i data-lucide='check' style='color:var(--success)'></i></div>
+                  <div class="success-title">\u00A1Solicitud registrada!</div>
                   <p class="success-desc">
-                    Hola <strong>${enrollData.nombre.replace(/\x60/g, "\\`")}</strong>, tu pago por <strong>${c.price.replace(/\x60/g, "\\`")}</strong> ha sido procesado correctamente.<br><br>
-                    Te has inscrito a <strong>${c.name.replace(/\x60/g, "\\`")}</strong>.<br>
-                    En breve recibir\u00E1s un correo en <strong>${enrollData.email.replace(/\x60/g, "\\`")}</strong> con tus credenciales de acceso y recibo de pago.<br><br>
-                    \u00A1Bienvenido/a a EPAD!
+                    Hola <strong>${enrollData.nombre.replace(/\x60/g, "\\`")}</strong>, hemos recibido tu solicitud de inscripci\u00F3n a <strong>${c.name.replace(/\x60/g, "\\`")}</strong> por <strong>${c.price.replace(/\x60/g, "\\`")}</strong>.<br><br>
+                    Un asesor verificar\u00E1 tu pago y te enviar\u00E1 tus accesos a <strong>${enrollData.email.replace(/\x60/g, "\\`")}</strong> en breve.<br><br>
+                    \u00A1Bienvenido/a a EPAD! \uD83C\uDF93
                   </p>
-                  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin:16px 0;font-size:12px;color:var(--success);text-align:left">
-                    <strong>Comprobante:</strong> #EPAD-${Math.random().toString(36).substring(2, 8).toUpperCase()} \u00B7 ${new Date().toLocaleDateString("es-MX")}
+                  <div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin:16px 0;font-size:12px;color:var(--success);text-align:left'>
+                    <strong>Folio de solicitud:</strong> ${folioId} &nbsp;\u00B7&nbsp; ${new Date().toLocaleDateString("es-MX")}
+                    ${referencia ? `<br><strong>Referencia de pago:</strong> ${referencia.replace(/</g, "&lt;")}` : ""}
                   </div>
-                  <button class="btn-submit" style="margin-top:8px" onclick="closeModal()">Cerrar</button>
+                  <div style='background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#7a6000;text-align:left;'>
+                    \uD83D\uDCA1 <strong>Siguiente paso:</strong> Si a\u00FAn no lo has hecho, env\u00EDa tu comprobante de pago por WhatsApp para agilizar la activaci\u00F3n de tu cuenta.
+                  </div>
+                  <button class="btn-pay" style="background:#25d366;border-color:#25d366;margin-bottom:10px;" onclick="window.open('https://wa.me/528719164677?text=${encodeURIComponent("Hola, acabo de registrar mi pago. Mi folio es: " + folioId + ". Adjunto mi comprobante.")}','_blank')">
+                    \u2705 Enviar comprobante por WhatsApp
+                  </button>
+                  <button class="btn-submit" style="margin-top:4px;background:var(--surface2);color:var(--text-secondary);border:1.5px solid var(--border);" onclick="closeModal()">Cerrar</button>
                 </div>`;
 }
 
@@ -467,7 +421,7 @@ function submitFree(courseName) {
   }
   document.getElementById("modal-body").innerHTML = `
                 <div class="success-msg">
-                  <div class="success-icon">&#9733;</div>
+                  <div class="success-icon"><i data-lucide='star' style='width:14px;height:14px;fill:currentColor'></i></div>
                   <div class="success-title">\u00A1Inscripci\u00F3n exitosa!</div>
                   <p class="success-desc">Hola <strong>${nombre.replace(/\x60/g, "\\`")}</strong>, te has inscrito a <strong>${courseName.replace(/\x60/g, "\\`")}</strong>.<br><br>En breve recibir\u00E1s un correo en <strong>${email.replace(/\x60/g, "\\`")}</strong> con tus credenciales de acceso.<br><br>\u00A1Bienvenido/a a EPAD!</p>
                   <button class="btn-submit" style="margin-top:16px" onclick="closeModal()">Cerrar</button>
@@ -551,11 +505,11 @@ function checkPlaneacionesAccess() {
   if (!currentUser || !currentSuscripcion) {
     if (paywall) {
       paywall.innerHTML = `
-              <div class="paywall-icon">📋</div>
+              <div class="paywall-icon"><i data-lucide='clipboard-list'></i></div>
               <div class="paywall-title">Acceso para docentes registrados</div>
               <div class="paywall-desc">Para usar las Planeaciones Didácticas necesitas una cuenta gratuita. ¡Los primeros 7 días son sin costo!</div>
-              <div class="paywall-timer">🎁 7 días gratis · Sin tarjeta requerida</div>
-              <button class="paywall-btn" onclick="showUserLogin(); setTimeout(()=>switchToRegister(),100);">🚀 Crear cuenta gratuita</button>
+              <div class="paywall-timer"><i data-lucide='gift'></i> 7 días gratis · Sin tarjeta requerida</div>
+              <button class="paywall-btn" onclick="showUserLogin(); setTimeout(()=>switchToRegister(),100);"><i data-lucide='rocket'></i> Crear cuenta gratuita</button>
               <div class="paywall-login-link" onclick="showUserLogin()">¿Ya tienes cuenta? Inicia sesión</div>
             `;
       paywall.style.display = "flex";
@@ -588,11 +542,11 @@ function checkPlaneacionesAccess() {
   // Trial vencido o cancelado
   if (paywall) {
     paywall.innerHTML = `
-            <div class="paywall-icon">🔒</div>
+            <div class="paywall-icon"><i data-lucide='lock'></i></div>
             <div class="paywall-title">Suscripción Requerida</div>
             <div class="paywall-desc">Tu período de prueba gratuita de ${TRIAL_DAYS} días ha terminado. Para seguir creando Planeaciones Didácticas, activa tu suscripción.</div>
-            <div class="paywall-timer">⏱ Tu prueba venció · Acceso bloqueado</div>
-            <button class="paywall-btn" onclick="openPaywallModal()">🚀 Activar suscripción — $149/mes</button>
+            <div class="paywall-timer"><i data-lucide='timer'></i> Tu prueba venció · Acceso bloqueado</div>
+            <button class="paywall-btn" onclick="openPaywallModal()"><i data-lucide='rocket'></i> Activar suscripción — $149/mes</button>
             <div class="paywall-login-link" onclick="doLogoutDocente()">Cerrar sesión</div>
           `;
     paywall.style.display = "flex";
@@ -844,6 +798,7 @@ function showSection(name, el) {
     videos: "Videos",
     courses: "Cursos",
     settings: "Configuraci\u00F3n",
+    "zona-materiales": "Zona de Aprendizaje",
   };
   document.getElementById("topbar-title").textContent = titles[name] || name;
 }
@@ -870,7 +825,7 @@ function renderBarChart(id, d1, d2, labels) {
       const h1 = Math.round((d1[i] / max) * 130),
         h2 = Math.round((d2[i] / max) * 130);
       return `<div class="bar-group">
-                  <div style="display:flex;gap:3px;align-items:flex-end;height:130px">
+                  <div style='display:flex;gap:3px;align-items:flex-end;height:130px'>
                     <div class="bar primary" style="height:${h1}px" data-label="2024: $${d1[i]}K"></div>
                     <div class="bar secondary" style="height:${h2}px" data-label="2025: $${d2[i]}K"></div>
                   </div>
@@ -923,7 +878,7 @@ function renderDonut() {
                   <text x="70" y="68" text-anchor="middle" font-size="13" font-weight="700" fill="var(--primary)" font-family="Merriweather,serif">Total</text>
                   <text x="70" y="84" text-anchor="middle" font-size="11" fill="var(--text-muted)">100%</text>
                 </svg>
-                <div class="donut-legend">${data.map((d) => `<div class="donut-item"><div class="donut-dot" style="background:${d.color}"></div><span style="flex:1;font-size:12px">${d.label}</span><span style="font-size:12px;font-weight:600;color:var(--primary)">${d.val}%</span></div>`).join("")}</div>`;
+                <div class="donut-legend">${data.map((d) => `<div class="donut-item"><div class="donut-dot" style='background:${d.color}'></div><span style='flex:1;font-size:12px'>${d.label}</span><span style='font-size:12px;font-weight:600;color:var(--primary)'>${d.val}%</span></div>`).join("")}</div>`;
 }
 
 function renderLineChart() {
@@ -986,8 +941,8 @@ function renderProgress() {
     .map(
       (b) => `
                 <div class="progress-item">
-                  <div class="progress-header"><span>${b.label}</span><span style="color:var(--text-muted)">${b.val}%</span></div>
-                  <div class="progress-track"><div class="progress-fill" style="width:${b.val}%;background:${b.color}"></div></div>
+                  <div class="progress-header"><span>${b.label}</span><span style='color:var(--text-muted)'>${b.val}%</span></div>
+                  <div class="progress-track"><div class="progress-fill" style='width:${b.val}%;background:${b.color}'></div></div>
                 </div>`,
     )
     .join("");
@@ -1012,9 +967,9 @@ function renderUsersTable(users) {
       (u) => `
                 <tr>
                   <td><strong>${u.name}</strong></td>
-                  <td style="color:var(--text-muted)">${u.email}</td>
+                  <td style='color:var(--text-muted)'>${u.email}</td>
                   <td>${u.role}</td>
-                  <td style="color:var(--text-muted)">${u.last}</td>
+                  <td style='color:var(--text-muted)'>${u.last}</td>
                   <td><span class="status-badge ${u.status}">${sl[u.status]}</span></td>
                 </tr>`,
     )
@@ -1049,14 +1004,14 @@ function renderProjects() {
     (p) => `
                 <tr>
                   <td><strong>${p.name}</strong></td>
-                  <td style="color:var(--text-muted)">${p.client}</td>
+                  <td style='color:var(--text-muted)'>${p.client}</td>
                   <td>
-                    <div style="display:flex;align-items:center;gap:8px">
-                      <div class="progress-track" style="flex:1;height:6px"><div class="progress-fill" style="width:${p.pct}%;background:var(--primary)"></div></div>
-                      <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;min-width:28px">${p.pct}%</span>
+                    <div style='display:flex;align-items:center;gap:8px'>
+                      <div class="progress-track" style='flex:1;height:6px'><div class="progress-fill" style='width:${p.pct}%;background:var(--primary)'></div></div>
+                      <span style='font-size:11px;color:var(--text-muted);white-space:nowrap;min-width:28px'>${p.pct}%</span>
                     </div>
                   </td>
-                  <td style="color:var(--text-muted)">${formatDate(p.due)}</td>
+                  <td style='color:var(--text-muted)'>${formatDate(p.due)}</td>
                   <td><span class="status-badge ${p.status === "done" ? "active" : p.status}">${sl[p.status]}</span></td>
                   <td>
                     <button class="edit-btn" onclick="editProject(${p.id})">Editar</button>
@@ -1085,7 +1040,7 @@ function renderPublicProjects() {
       console.warn("projects-grid not found");
       return;
     }
-    if (!window.PROJECTS || PROJECTS.length === 0) {
+    if (!PROJECTS || PROJECTS.length === 0) {
       grid.innerHTML =
         '<p style="color:var(--text-muted);text-align:center;padding:24px 0;">No hay proyectos disponibles.</p>';
       return;
@@ -1102,19 +1057,19 @@ function renderPublicProjects() {
     };
     grid.innerHTML = PROJECTS.map(
       (p) => `
-                  <div style="background:var(--surface);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);margin-bottom:12px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                  <div style='background:var(--surface);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);margin-bottom:12px;'>
+                    <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;'>
                       <strong>${p.name}</strong>
                       <span style="background:${_sc[p.status] || "var(--primary)"};color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">${_sl[p.status] || p.status}</span>
                     </div>
-                    <div style="color:var(--text-muted);font-size:13px;margin-bottom:8px;">${p.client}</div>
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                      <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-                        <div style="width:${p.pct}%;height:100%;background:var(--primary);border-radius:3px;"></div>
+                    <div style='color:var(--text-muted);font-size:13px;margin-bottom:8px;'>${p.client}</div>
+                    <div style='display:flex;align-items:center;gap:8px;margin-bottom:8px;'>
+                      <div style='flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;'>
+                        <div style='width:${p.pct}%;height:100%;background:var(--primary);border-radius:3px;'></div>
                       </div>
-                      <span style="font-size:11px;color:var(--text-muted);">${p.pct}%</span>
+                      <span style='font-size:11px;color:var(--text-muted);'>${p.pct}%</span>
                     </div>
-                    <span style="font-size:12px;color:var(--text-muted);">Fecha l\u00EDmite: ${formatDate(p.due)}</span>
+                    <span style='font-size:12px;color:var(--text-muted);'>Fecha l\u00EDmite: ${formatDate(p.due)}</span>
                   </div>`,
     ).join("");
   } catch (e) {
@@ -1408,10 +1363,10 @@ function renderReports() {
   document.getElementById("reports-list").innerHTML = r
     .map(
       (x) => `
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-light)">
-                  <div style="display:flex;align-items:center;gap:14px">
-                    <div style="font-size:22px">${x.type}</div>
-                    <div><div style="font-size:14px;font-weight:500;color:var(--text)">${x.name}</div><div style="font-size:12px;color:var(--text-muted)">${x.date} \u00B7 ${x.size}</div></div>
+                <div style='display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-light)'>
+                  <div style='display:flex;align-items:center;gap:14px'>
+                    <div style='font-size:22px'>${x.type}</div>
+                    <div><div style='font-size:14px;font-weight:500;color:var(--text)'>${x.name}</div><div style='font-size:12px;color:var(--text-muted)'>${x.date} \u00B7 ${x.size}</div></div>
                   </div>
                   <button class="topbar-btn" onclick="alert('Descargando ${x.name}...')">&#8659; Descargar</button>
                 </div>`,
@@ -1690,14 +1645,14 @@ function renderPublicVideos() {
       const isHero = idx === 0;
       let mediaHtml = "";
       if (embed && /\.(mp4|webm|ogg)/i.test(embed)) {
-        mediaHtml = `<video class="vid-frame" src="${embed}" autoplay muted loop playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></video>`;
+        mediaHtml = `<video class="vid-frame" src="${embed}" autoplay muted loop playsinline style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;'></video>`;
       } else if (embed) {
         const sep = embed.includes("?") ? "&" : "?";
-        mediaHtml = `<iframe class="vid-frame" src="${embed}${sep}autoplay=0&mute=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"></iframe>`;
+        mediaHtml = `<iframe class="vid-frame" src="${embed}${sep}autoplay=0&mute=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style='position:absolute;top:0;left:0;width:100%;height:100%;border:none;'></iframe>`;
       } else {
-        mediaHtml = `<div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a3a5c,#122840);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
-                      <div style="font-size:48px;">&#9654;</div>
-                      <div style="color:rgba(255,255,255,0.5);font-size:13px;">Video no disponible</div>
+        mediaHtml = `<div style='position:absolute;inset:0;background:linear-gradient(135deg,#1a3a5c,#122840);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;'>
+                      <div style='font-size:48px;'>&#9654;</div>
+                      <div style='color:rgba(255,255,255,0.5);font-size:13px;'>Video no disponible</div>
                     </div>`;
       }
       return `
@@ -1772,7 +1727,7 @@ const WA_FLOW = {
   },
 
   usicamm: {
-    msg: `&#9635; *Planes USICAMM 2026 \u2014 EPAD*\n\nPrep\u00E1rate con los mejores:\n*Profa. Roc\u00EDo \u00B7 El Crack \u00B7 Profe Paco R\u00EDos \u00B7 Mtra. Azalhia*\n\n&#9636; *Cuadernillo* \u2014 Material de estudio completo\n&#8982; *Simulador* \u2014 Reactivos reales cronometrados\n&#9632; *Plataforma web* \u2014 Contenido + seguimiento de avance\n&#9654; *Plan Completo* \u2014 Todo incluido + Sesiones en vivo + Dudas\n\n&#9733; *\u00A1Oferta!* Plan Completo: ~~$3,000~~ \u2192 *$1,499 MXN*\n\n\u00BFQu\u00E9 plan te interesa?`,
+    msg: `&#9635; *Planes USICAMM 2026 \u2014 EPAD*\n\nPrep\u00E1rate con los mejores:\n*Profa. Roc\u00EDo \u00B7 El Crack \u00B7 Profe Paco R\u00EDos \u00B7 Mtra. Azalhia*\n\n&#9636; *Cuadernillo* \u2014 Material de estudio completo\n&#8982; *Simulador* \u2014 Reactivos reales cronometrados\n&#9632; *Plataforma web* \u2014 Contenido + seguimiento de avance\n&#9654; *Plan Completo* \u2014 Todo incluido + Sesiones en vivo + Dudas\n\n<i data-lucide='star' style='width:14px;height:14px;fill:currentColor'></i> *\u00A1Oferta!* Plan Completo: ~~$3,000~~ \u2192 *$1,499 MXN*\n\n\u00BFQu\u00E9 plan te interesa?`,
     options: [
       { label: "Horas Adicionales", next: "usicamm_horas" },
       { label: "Admisi\u00F3n B\u00E1sica", next: "usicamm_admision" },
@@ -2031,7 +1986,9 @@ function waAddMsg(text, type) {
     safe +
     '<div class="wa-msg-time">' +
     waTime() +
-    (type === "user" ? " &#10003;&#10003;" : "") +
+    (type === "user"
+      ? " <i data-lucide='check' style='color:var(--success)'></i><i data-lucide='check' style='color:var(--success)'></i>"
+      : "") +
     "</div>";
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
@@ -2308,8 +2265,8 @@ function addCampo(nivel, prefix) {
   div.className = "campo-row";
   div.id = "campo-" + prefix + "-" + n;
   div.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="flex:1">
+                <div style='display:flex;align-items:center;gap:8px;'>
+                  <div style='flex:1'>
                     <label class="pf-label">Momento</label>
                     <select class="pf-select" id="campo-${prefix}-${n}-momento">
                       <option>Inicio</option><option>Desarrollo</option><option>Cierre</option>
@@ -2321,11 +2278,11 @@ function addCampo(nivel, prefix) {
                   <label class="pf-label">Tiempo estimado</label>
                   <input class="pf-input" id="campo-${prefix}-${n}-tiempo" placeholder="Ej. 30 min" />
                 </div>
-                <div style="grid-column:1/-1">
+                <div style='grid-column:1/-1'>
                   <label class="pf-label">Descripci\u00F3n de la actividad</label>
-                  <textarea class="pf-textarea" id="campo-${prefix}-${n}-act" placeholder="Describe la actividad..." style="min-height:70px"></textarea>
+                  <textarea class="pf-textarea" id="campo-${prefix}-${n}-act" placeholder="Describe la actividad..." style='min-height:70px'></textarea>
                 </div>
-                <div style="grid-column:1/-1">
+                <div style='grid-column:1/-1'>
                   <label class="pf-label">Recursos / materiales</label>
                   <input class="pf-input" id="campo-${prefix}-${n}-rec" placeholder="Materiales necesarios..." />
                 </div>
@@ -2460,7 +2417,8 @@ function validateField(el, msg, minLen, nivel, fields) {
     el.classList.add("valid");
     if (hint) {
       hint.className = "field-hint ok";
-      hint.textContent = "&#10003; Listo";
+      hint.textContent =
+        "<i data-lucide='check' style='color:var(--success)'></i> Listo";
     }
   }
   // Update progress
@@ -2483,7 +2441,7 @@ function validateField(el, msg, minLen, nivel, fields) {
   if (lbl)
     lbl.textContent =
       pct === 100
-        ? "Formulario completo &#10003;"
+        ? "Formulario completo <i data-lucide='check' style='color:var(--success)'></i>"
         : "Campos completados: " + filled + " / " + fields.length;
 }
 
@@ -2552,277 +2510,12 @@ function exportarExcel(nivel) {
   showToast("Planeaci\u00F3n exportada a Excel/CSV correctamente.");
 }
 
-async function generarPlaneacion(nivel) {
-  // ── PAYWALL CHECK ──
-  if (!checkPlaneacionesAccess()) {
-    document
-      .getElementById("planeaciones")
-      .scrollIntoView({ behavior: "smooth" });
-    showToast(
-      "⚠ Crea una cuenta o suscríbete para generar planeaciones con IA.",
-    );
-    return;
-  }
-  const prefix = PREFIX[nivel];
-  const matKey = selectedMateria[nivel];
-  if (!matKey) {
-    alert("Por favor selecciona una materia primero.");
-    return;
-  }
-  const matInfo = MATERIAS_INFO[matKey];
-  const docente =
-    document.getElementById(prefix + "-docente").value.trim() || "Docente";
-  const grado =
-    document.getElementById(prefix + "-grado").value.trim() || "\u2014";
-  const ciclo =
-    document.getElementById(prefix + "-ciclo").value.trim() || "2025\u20132026";
-  const periodo =
-    document.getElementById(prefix + "-periodo").value.trim() || "\u2014";
-  const proposito = document.getElementById(prefix + "-proposito").value.trim();
-  const evalTipo = document.getElementById(prefix + "-eval-tipo").value;
-  const evalInst = document.getElementById(prefix + "-eval-inst").value.trim();
-  const adecuaciones = document
-    .getElementById(prefix + "-adecuaciones")
-    .value.trim();
-  const notas = document.getElementById(prefix + "-notas").value.trim();
-
-  // Collect actividades
-  const campos = document.querySelectorAll("#campos-" + nivel + " .campo-row");
-  let actividades = [];
-  campos.forEach((row, i) => {
-    const inputs = row.querySelectorAll("input, textarea, select");
-    let act = { momento: "", tiempo: "", descripcion: "", recursos: "" };
-    inputs.forEach((el) => {
-      if (el.tagName === "SELECT") act.momento = el.value;
-      else if (el.id && el.id.includes("-tiempo")) act.tiempo = el.value;
-      else if (el.tagName === "TEXTAREA") act.descripcion = el.value;
-      else if (el.id && el.id.includes("-rec")) act.recursos = el.value;
-    });
-    if (act.descripcion || act.momento) actividades.push(act);
-  });
-
-  // Build prompt
-  const nLabel = NIVEL_LABELS[nivel];
-  const prompt = `Eres un experto en did\u00E1ctica y pedagog\u00EDa mexicana alineado al plan de estudios SEP 2022 (Nueva Escuela Mexicana).
-      Genera una planeaci\u00F3n did\u00E1ctica profesional y completa en espa\u00F1ol para:
-      - Nivel: ${nLabel}
-      - Materia/Campo formativo: ${matInfo.icon} ${matInfo.name}
-      - Grado/Grupo: ${grado}
-      - Docente: ${docente}
-      - Ciclo: ${ciclo} | Per\u00EDodo: ${periodo}
-      - Prop\u00F3sito/Aprendizaje esperado: ${proposito || "Definir aprendizajes esperados acordes al campo formativo"}
-      - Actividades planeadas por el docente: ${JSON.stringify(actividades)}
-      - Evaluaci\u00F3n: ${evalTipo} / ${evalInst || "por definir"}
-      - Adecuaciones: ${adecuaciones || "Ninguna especificada"}
-      - Notas del docente: ${notas || "Ninguna"}
-
-      Responde \u00DANICAMENTE con un JSON v\u00E1lido sin ning\u00FAn texto adicional ni marcas de c\u00F3digo. El JSON debe tener esta estructura exacta:
-      {
-        "proposito_enriquecido": "texto",
-        "ejes_articuladores": ["eje1","eje2"],
-        "secuencia": [
-          {"momento":"Inicio","tiempo":"20 min","actividad":"texto","recursos":"texto"},
-          {"momento":"Desarrollo","tiempo":"40 min","actividad":"texto","recursos":"texto"},
-          {"momento":"Cierre","tiempo":"20 min","actividad":"texto","recursos":"texto"}
-        ],
-        "evaluacion": {
-          "tipo": "texto",
-          "instrumento": "texto",
-          "indicadores": ["indicador1","indicador2","indicador3"]
-        },
-        "adecuaciones_sugeridas": "texto",
-        "reflexion_docente": "texto"
-      }`;
-
-  // Show spinner
-  const spinner = document.getElementById("spinner-" + nivel);
-  const preview = document.getElementById("preview-" + nivel);
-  spinner.classList.add("visible");
-  preview.classList.remove("visible");
-  preview.innerHTML = "";
-
-  try {
-    const response = await fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 },
-      }),
-    });
-    if (!response.ok) throw new Error("API error " + response.status);
-    const data = await response.json();
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    raw = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/```$/, "")
-      .trim();
-    raw = raw.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, "$1").trim();
-    const plan = JSON.parse(raw);
-    spinner.classList.remove("visible");
-    renderPreview(nivel, plan, {
-      docente,
-      grado,
-      ciclo,
-      periodo,
-      matInfo,
-      nLabel,
-    });
-  } catch (err) {
-    console.warn("API no disponible, usando modo b\u00E1sico:", err);
-    spinner.classList.remove("visible");
-    renderPreviewBasic(nivel, {
-      docente,
-      grado,
-      ciclo,
-      periodo,
-      matInfo,
-      nLabel,
-      actividades,
-      evalTipo,
-      evalInst,
-      adecuaciones,
-      notas,
-      proposito,
-    });
-  }
-}
-
-function renderPreview(nivel, plan, meta) {
-  const preview = document.getElementById("preview-" + nivel);
-  const secRows = plan.secuencia
-    .map(
-      (s) => `
-                <tr>
-                  <td><strong>${s.momento}</strong></td>
-                  <td>${s.tiempo}</td>
-                  <td>${s.actividad}</td>
-                  <td>${s.recursos}</td>
-                </tr>`,
-    )
-    .join("");
-  const indicadores = (plan.evaluacion.indicadores || [])
-    .map((i) => `<li>${i}</li>`)
-    .join("");
-  const ejes = (plan.ejes_articuladores || []).join(" \u2022 ");
-
-  preview.innerHTML = `
-                <div class="preview-title">
-                  ${meta.matInfo.icon} Planeaci\u00F3n Did\u00E1ctica &nbsp;<span class="ai-badge">&#10024; IA</span>
-                </div>
-                <table class="preview-table">
-                  <tr><th>Docente</th><th>Grado/Grupo</th><th>Ciclo</th><th>Per\u00EDodo</th></tr>
-                  <tr><td>${meta.docente}</td><td>${meta.grado}</td><td>${meta.ciclo}</td><td>${meta.periodo}</td></tr>
-                </table>
-                <table class="preview-table">
-                  <tr><th>Nivel</th><th>Campo formativo</th><th>Ejes articuladores</th></tr>
-                  <tr><td>${meta.nLabel}</td><td>${meta.matInfo.icon} ${meta.matInfo.name}</td><td>${ejes || "\u2014"}</td></tr>
-                </table>
-                <div class="preview-section-h">&#9670; Prop\u00F3sito / Aprendizaje esperado</div>
-                <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">${plan.proposito_enriquecido.replace(/\x60/g, "\\`")}</p>
-                <div class="preview-section-h">&#9635; Secuencia Did\u00E1ctica</div>
-                <table class="preview-table">
-                  <tr><th>Momento</th><th>Tiempo</th><th>Actividad</th><th>Recursos</th></tr>
-                  ${secRows}
-                </table>
-                <div class="preview-section-h">&#9636; Evaluaci\u00F3n</div>
-                <table class="preview-table">
-                  <tr><th>Tipo</th><th>Instrumento</th></tr>
-                  <tr><td>${plan.evaluacion.tipo}</td><td>${plan.evaluacion.instrumento}</td></tr>
-                </table>
-                ${indicadores ? `<div class="preview-section-h">&#10003; Indicadores de evaluaci\u00F3n</div><ul class="preview-act-list">${indicadores}</ul>` : ""}
-                ${plan.adecuaciones_sugeridas ? `<div class="preview-section-h">&#9906; Adecuaciones curriculares</div><p style="font-size:13px;color:var(--text-secondary);line-height:1.6">${plan.adecuaciones_sugeridas.replace(/\x60/g, "\\`")}</p>` : ""}
-                ${plan.reflexion_docente ? `<div class="preview-section-h">&#9673; Reflexi\u00F3n docente sugerida</div><p style="font-size:13px;color:var(--text-secondary);line-height:1.6;font-style:italic">${plan.reflexion_docente.replace(/\x60/g, "\\`")}</p>` : ""}
-                <div class="print-bar">
-                  <button class="btn-print outline" onclick="limpiarFormulario('${nivel}')">&#8635; Nueva planeaci\u00F3n</button>
-                  <button class="btn-print outline" style="border-color:var(--success);color:var(--success);" onclick="exportarExcel('${nivel}')">&#8659; Exportar Excel</button>
-                  <button class="btn-print primary" onclick="imprimirPlaneacion('${nivel}')">&#9113; Imprimir / PDF</button>
-                </div>
-              `;
-  preview.classList.add("visible");
-  preview.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function renderPreviewBasic(nivel, d) {
-  const preview = document.getElementById("preview-" + nivel);
-  const actRows = d.actividades
-    .map(
-      (a) => `
-                <tr>
-                  <td><strong>${a.momento}</strong></td>
-                  <td>${a.tiempo || "\u2014"}</td>
-                  <td>${a.descripcion || "\u2014"}</td>
-                  <td>${a.recursos || "\u2014"}</td>
-                </tr>`,
-    )
-    .join("");
-  preview.innerHTML = `
-                <div class="preview-title">&#9635; Planeaci\u00F3n Did\u00E1ctica</div>
-                <table class="preview-table">
-                  <tr><th>Docente</th><th>Grado/Grupo</th><th>Ciclo</th><th>Per\u00EDodo</th></tr>
-                  <tr><td>${d.docente}</td><td>${d.grado}</td><td>${d.ciclo}</td><td>${d.periodo}</td></tr>
-                </table>
-                <table class="preview-table">
-                  <tr><th>Nivel</th><th>Campo formativo</th></tr>
-                  <tr><td>${d.nLabel}</td><td>${d.matInfo.icon} ${d.matInfo.name}</td></tr>
-                </table>
-                ${d.proposito ? `<div class="preview-section-h">&#9670; Prop\u00F3sito</div><p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">${d.proposito.replace(/\x60/g, "\\`")}</p>` : ""}
-                <div class="preview-section-h">&#9635; Secuencia Did\u00E1ctica</div>
-                <table class="preview-table">
-                  <tr><th>Momento</th><th>Tiempo</th><th>Actividad</th><th>Recursos</th></tr>
-                  ${actRows || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Sin actividades capturadas</td></tr>'}
-                </table>
-                <table class="preview-table">
-                  <tr><th>Evaluaci\u00F3n</th><th>Instrumento</th></tr>
-                  <tr><td>${d.evalTipo}</td><td>${d.evalInst || "\u2014"}</td></tr>
-                </table>
-                ${d.notas ? `<div class="preview-section-h">&#9673; Notas del docente</div><p style="font-size:13px;color:var(--text-secondary);line-height:1.6;font-style:italic">${d.notas.replace(/\x60/g, "\\`")}</p>` : ""}
-                <div class="print-bar">
-                  <button class="btn-print outline" onclick="limpiarFormulario('${nivel}')">&#8635; Nueva planeaci\u00F3n</button>
-                  <button class="btn-print outline" style="border-color:var(--success);color:var(--success);" onclick="exportarExcel('${nivel}')">&#8659; Exportar Excel</button>
-                  <button class="btn-print primary" onclick="imprimirPlaneacion('${nivel}')">&#9113; Imprimir / PDF</button>
-                </div>
-              `;
-  preview.classList.add("visible");
-  preview.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function imprimirPlaneacion(nivel) {
-  const preview = document.getElementById("preview-" + nivel);
-  if (!preview || !preview.innerHTML) return;
-  const win = window.open("", "_blank");
-  const htmlContent =
-    '<!DOCTYPE html><html lang="es"><head>' +
-    '<meta charset="UTF-8">' +
-    "<title>Planeaci\u00F3n Did\u00E1ctica \u2013 EPAD</title>" +
-    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">' +
-    "<style>" +
-    "body { font-family: 'Inter', sans-serif; font-size: 13px; color: #1a2733; padding: 32px; max-width: 900px; margin: 0 auto; }" +
-    "h1 { font-family: 'Merriweather', serif; font-size: 20px; color: #1a3a5c; border-bottom: 2px solid #1a3a5c; padding-bottom: 10px; margin-bottom: 20px; }" +
-    "table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }" +
-    "th { background: #1a3a5c; color: #fff; padding: 8px 12px; text-align: left; }" +
-    "td { padding: 8px 12px; border-bottom: 1px solid #ddd; vertical-align: top; line-height: 1.5; }" +
-    "tr:nth-child(even) td { background: #f5f7fa; }" +
-    ".sh { font-weight: 700; color: #1a3a5c; font-size: 13px; margin: 16px 0 8px; }" +
-    "ul { padding-left: 20px; }" +
-    "li { margin-bottom: 6px; }" +
-    "p { line-height: 1.7; color: #4a5568; }" +
-    ".footer { margin-top: 32px; font-size: 11px; color: #aaa; text-align: center; border-top: 1px solid #ddd; padding-top: 12px; }" +
-    "@media print { body { padding: 16px; } }" +
-    "</style>" +
-    "</head><body>" +
-    preview.innerHTML.replace(/<div class="print-bar">[\s\S]*?<\/div>/g, "") +
-    '<div class="footer">Generado por EPAD \u2014 Equipo Pedag\u00F3gico de Apoyo Docente \u00B7 epad.mx</div>' +
-    "</body></html>";
-  win.document.write(htmlContent);
-  win.document.close();
-  setTimeout(() => win.print(), 500);
-}
 // ============================================================
-//  EPAD — Conexión segura a Gemini vía backend proxy
+//  EPAD — Generación de planeaciones con Groq (Llama 3.3)
 // ============================================================
 
-const BACKEND_URL = "https://epad-backend-production.up.railway.app";
+const GROQ_API_KEY_PLAN = process.env.GROQ_API_KEY || "";
+const GROQ_MODEL_PLAN = "llama-3.3-70b-versatile";
 
 async function generarPlaneacion(nivel) {
   if (!checkPlaneacionesAccess()) {
@@ -2874,18 +2567,53 @@ async function generarPlaneacion(nivel) {
   });
 
   const nLabel = NIVEL_LABELS[nivel];
+  // Formatea las actividades de forma legible para el modelo
+  const actividadesTexto =
+    actividades.length > 0
+      ? actividades
+          .map(
+            (a, i) =>
+              `  ${i + 1}. [${a.momento || "Sin momento"}] ` +
+              `Tiempo: ${a.tiempo || "no especificado"} — ` +
+              `${a.descripcion || "Sin descripción"} ` +
+              `(Recursos: ${a.recursos || "no especificados"})`,
+          )
+          .join("\n")
+      : "  El docente no capturó actividades previas. Genera una secuencia completa desde cero.";
+
   const prompt = `
-Genera una planeación didáctica profesional y completa en español para:
-- Nivel educativo: ${nLabel}
-- Campo formativo / Materia: ${matInfo.icon} ${matInfo.name}
-- Grado / Grupo: ${grado}
-- Docente: ${docente}
-- Ciclo escolar: ${ciclo} | Período: ${periodo}
-- Propósito: ${proposito || "Desarrollar competencias acordes al campo formativo"}
-- Actividades: ${JSON.stringify(actividades)}
-- Evaluación: ${evalTipo} / ${evalInst || "por definir"}
-- Adecuaciones: ${adecuaciones || "Ninguna"}
-- Notas: ${notas || "Ninguna"}
+Genera una planeación didáctica enriquecida para el siguiente contexto docente:
+
+═══ DATOS DEL DOCENTE ═══
+• Nivel educativo : ${nLabel}
+• Campo formativo : ${matInfo.name}
+• Grado / Grupo   : ${grado}
+• Docente         : ${docente}
+• Ciclo escolar   : ${ciclo}
+• Período         : ${periodo}
+
+═══ PROPÓSITO ORIGINAL DEL DOCENTE ═══
+"${proposito || "Desarrollar competencias acordes al campo formativo y al nivel educativo."}"
+
+Enriquece este propósito con lenguaje NEM: integra saberes, habilidades y actitudes.
+
+═══ ACTIVIDADES PLANIFICADAS POR EL DOCENTE ═══
+${actividadesTexto}
+
+Respeta y mejora estas actividades si existen. Si no hay actividades, diseña una
+secuencia Inicio-Desarrollo-Cierre coherente con el propósito y el nivel educativo.
+
+═══ EVALUACIÓN ═══
+• Tipo       : ${evalTipo || "Por definir"}
+• Instrumento: ${evalInst || "Por definir — elige el más apropiado para el campo formativo"}
+
+═══ ADECUACIONES CURRICULARES ═══
+${adecuaciones || "No especificadas — sugiere al menos una estrategia DUA y una para NEE."}
+
+═══ NOTAS ADICIONALES DEL DOCENTE ═══
+${notas || "Sin notas adicionales."}
+
+Devuelve ÚNICAMENTE el JSON con la estructura establecida. Sin texto extra.
 `.trim();
 
   const spinner = document.getElementById("spinner-" + nivel);
@@ -2895,25 +2623,103 @@ Genera una planeación didáctica profesional y completa en español para:
   preview.innerHTML = "";
 
   try {
-    const response = await fetch(`${BACKEND_URL}/api/planeacion`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
+    // ── Llamada a Groq (Llama 3.3) ───────────────────────────
+    const systemPrompt = `Eres un experto en didáctica y curriculum de educación básica mexicana (Plan de Estudios 2022 NEM).
+Genera ÚNICAMENTE un objeto JSON válido con esta estructura exacta. Sin texto extra, sin markdown, sin backticks, sin comentarios.
+
+{
+  "proposito_enriquecido": "string — propósito enriquecido con lenguaje NEM",
+  "actividades": [
+    {
+      "momento": "Inicio",
+      "tiempo": "string",
+      "descripcion": "string detallada de la actividad",
+      "recursos": "string",
+      "consigna_alumno": "string — instrucción exacta que el docente lee en voz alta al grupo"
+    },
+    {
+      "momento": "Desarrollo",
+      "tiempo": "string",
+      "descripcion": "string detallada",
+      "recursos": "string",
+      "consigna_alumno": "string"
+    },
+    {
+      "momento": "Cierre",
+      "tiempo": "string",
+      "descripcion": "string detallada",
+      "recursos": "string",
+      "consigna_alumno": "string"
+    }
+  ],
+  "evaluacion": {
+    "tipo": "string",
+    "instrumento": "string",
+    "indicadores": ["string", "string", "string"]
+  },
+  "lista_cotejo": [
+    { "criterio": "string — criterio observable y medible", "logrado": "", "en_proceso": "", "no_logrado": "" },
+    { "criterio": "string", "logrado": "", "en_proceso": "", "no_logrado": "" },
+    { "criterio": "string", "logrado": "", "en_proceso": "", "no_logrado": "" },
+    { "criterio": "string", "logrado": "", "en_proceso": "", "no_logrado": "" },
+    { "criterio": "string", "logrado": "", "en_proceso": "", "no_logrado": "" }
+  ],
+  "hoja_trabajo": {
+    "titulo": "string — título atractivo para los alumnos",
+    "instrucciones": "string — instrucciones claras dirigidas al alumno",
+    "secciones": [
+      { "tipo": "texto_libre", "titulo": "string", "lineas": 5 },
+      { "tipo": "tabla", "titulo": "string", "columnas": ["string","string","string"], "filas": 4 },
+      { "tipo": "reflexion", "pregunta": "string — pregunta de cierre reflexiva" }
+    ]
+  },
+  "adecuaciones": { "dua": "string", "nee": "string" },
+  "reflexion_docente": "string"
+}`;
+
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GROQ_API_KEY_PLAN}`,
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL_PLAN,
+          max_tokens: 2000,
+          temperature: 0.5,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: prompt },
+          ],
+        }),
+      },
+    );
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
       throw new Error(
-        errData.error || `Error del servidor (${response.status})`,
+        errData.error?.message || `Error de API Groq (${response.status})`,
       );
     }
 
-    const data = await response.json();
-    if (!data.success || !data.planeacion)
-      throw new Error("Respuesta inesperada.");
+    const apiData = await response.json();
+    const rawText = apiData.choices?.[0]?.message?.content || "";
+
+    // Parsear el JSON que devuelve el modelo
+    let planeacion;
+    try {
+      const clean = rawText.replace(/```json|```/g, "").trim();
+      planeacion = JSON.parse(clean);
+    } catch {
+      throw new Error(
+        "La IA devolvió un formato inesperado. Intenta de nuevo.",
+      );
+    }
 
     spinner.classList.remove("visible");
-    renderPreview(nivel, data.planeacion, {
+    renderPreview(nivel, planeacion, {
       docente,
       grado,
       ciclo,
@@ -2926,14 +2732,978 @@ Genera una planeación didáctica profesional y completa en español para:
     spinner.classList.remove("visible");
     preview.classList.add("visible");
     preview.innerHTML = `
-      <div style="background:#fff0f0;border:1.5px solid #e53935;border-radius:12px;padding:28px 24px;text-align:center;color:#b71c1c;">
-        <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
-        <div style="font-weight:700;font-size:16px;margin-bottom:8px;">No se pudo generar la planeación</div>
-        <div style="font-size:13px;margin-bottom:18px;">${err.message}</div>
+      <div style='background:#fff0f0;border:1.5px solid #e53935;border-radius:12px;padding:28px 24px;text-align:center;color:#b71c1c;'>
+        <div style='font-size:32px;margin-bottom:10px;'><i data-lucide='alert-triangle'></i></div>
+        <div style='font-weight:700;font-size:16px;margin-bottom:8px;'>No se pudo generar la planeación</div>
+        <div style='font-size:13px;margin-bottom:18px;'>${err.message}</div>
         <button onclick="generarPlaneacion('${nivel}')"
-          style="background:#e53935;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;">
-          🔄 Reintentar
+          style='background:#e53935;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-weight:600;cursor:pointer;'>
+          <i data-lucide='refresh-cw'></i> Reintentar
         </button>
       </div>`;
   }
+}
+
+// ============================================================
+//  RENDER PREVIEW — Planeación completa lista para imprimir
+// ============================================================
+function renderPreview(
+  nivel,
+  plan,
+  { docente, grado, ciclo, periodo, matInfo, nLabel },
+) {
+  const preview = document.getElementById("preview-" + nivel);
+  if (!preview) return;
+
+  const actividades = Array.isArray(plan.actividades) ? plan.actividades : [];
+  const evaluacion = plan.evaluacion || {};
+  const adecuaciones = plan.adecuaciones || {};
+  const listaCotejo = Array.isArray(plan.lista_cotejo) ? plan.lista_cotejo : [];
+  const hoja = plan.hoja_trabajo || {};
+  const secciones = Array.isArray(hoja.secciones) ? hoja.secciones : [];
+  const indicadores = Array.isArray(evaluacion.indicadores)
+    ? evaluacion.indicadores
+    : [];
+
+  const momentoColor = {
+    Inicio: {
+      bg: "#e8f5e9",
+      border: "#27ae60",
+      badge: "#27ae60",
+      text: "#1a5c35",
+    },
+    Desarrollo: {
+      bg: "#e8f0ff",
+      border: "#2563a8",
+      badge: "#2563a8",
+      text: "#1a3a5c",
+    },
+    Cierre: {
+      bg: "#fff8e6",
+      border: "#c8952a",
+      badge: "#c8952a",
+      text: "#7a4a10",
+    },
+  };
+
+  // ── Actividades ───────────────────────────────────────
+  const actHTML =
+    actividades
+      .map((a) => {
+        const c = momentoColor[a.momento] || momentoColor["Inicio"];
+        return `
+      <div style="border:2px solid ${c.border};border-radius:12px;margin-bottom:14px;overflow:hidden;page-break-inside:avoid;">
+        <div style="background:${c.badge};padding:8px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#fff;font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase;">${a.momento || "Actividad"}</span>
+          ${a.tiempo ? `<span style="color:rgba(255,255,255,0.85);font-size:12px;">⏱ ${a.tiempo}</span>` : ""}
+        </div>
+        <div style="background:${c.bg};padding:14px 16px;">
+          <p style="font-size:13.5px;line-height:1.7;color:#1a1a1a;margin:0 0 8px;">${a.descripcion || "—"}</p>
+          ${a.recursos ? `<p style="font-size:12px;color:#555;margin:0 0 8px;"><strong>📦 Recursos:</strong> ${a.recursos}</p>` : ""}
+          ${
+            a.consigna_alumno
+              ? `
+          <div style="background:rgba(255,255,255,0.7);border-left:3px solid ${c.border};padding:8px 12px;border-radius:0 8px 8px 0;margin-top:6px;">
+            <span style="font-size:11px;font-weight:700;color:${c.text};text-transform:uppercase;letter-spacing:1px;">💬 Consigna al grupo</span>
+            <p style="font-size:13px;font-style:italic;color:#333;margin:4px 0 0;">"${a.consigna_alumno}"</p>
+          </div>`
+              : ""
+          }
+        </div>
+      </div>`;
+      })
+      .join("") || "<p style='color:#888;font-size:13px;'>Sin actividades.</p>";
+
+  // ── Lista de cotejo ───────────────────────────────────
+  const cotejoHTML = listaCotejo.length
+    ? `
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;">
+      <thead>
+        <tr style="background:#1a3a5c;color:#fff;">
+          <th style="padding:10px 12px;text-align:left;width:55%;">Criterio de evaluación</th>
+          <th style="padding:10px 8px;text-align:center;width:15%;">✅ Logrado</th>
+          <th style="padding:10px 8px;text-align:center;width:15%;">🔄 En proceso</th>
+          <th style="padding:10px 8px;text-align:center;width:15%;">❌ No logrado</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${listaCotejo
+          .map(
+            (r, i) => `
+        <tr style="background:${i % 2 === 0 ? "#f8faff" : "#fff"};">
+          <td style="padding:10px 12px;border-bottom:1px solid #e0e8f5;">${r.criterio}</td>
+          <td style="padding:10px;text-align:center;border-bottom:1px solid #e0e8f5;"><span style="display:inline-block;width:18px;height:18px;border:2px solid #27ae60;border-radius:4px;"></span></td>
+          <td style="padding:10px;text-align:center;border-bottom:1px solid #e0e8f5;"><span style="display:inline-block;width:18px;height:18px;border:2px solid #2563a8;border-radius:4px;"></span></td>
+          <td style="padding:10px;text-align:center;border-bottom:1px solid #e0e8f5;"><span style="display:inline-block;width:18px;height:18px;border:2px solid #e53935;border-radius:4px;"></span></td>
+        </tr>`,
+          )
+          .join("")}
+      </tbody>
+    </table>`
+    : "";
+
+  // ── Secciones hoja de trabajo ─────────────────────────
+  const seccionesHTML = secciones
+    .map((s) => {
+      if (s.tipo === "texto_libre") {
+        return `
+        <div style="margin-bottom:20px;page-break-inside:avoid;">
+          <p style="font-weight:700;font-size:13px;color:#1a3a5c;margin-bottom:8px;">📝 ${s.titulo || ""}</p>
+          ${Array.from({ length: s.lineas || 5 }, () => `<div style="border-bottom:1.5px solid #bbb;height:28px;margin-bottom:2px;"></div>`).join("")}
+        </div>`;
+      }
+      if (s.tipo === "tabla") {
+        const cols = Array.isArray(s.columnas) ? s.columnas : [];
+        return `
+        <div style="margin-bottom:20px;page-break-inside:avoid;">
+          <p style="font-weight:700;font-size:13px;color:#1a3a5c;margin-bottom:8px;">📊 ${s.titulo || ""}</p>
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+            <thead><tr>${cols.map((c) => `<th style="background:#1a3a5c;color:#fff;padding:8px 10px;text-align:left;border:1px solid #1a3a5c;">${c}</th>`).join("")}</tr></thead>
+            <tbody>${Array.from({ length: s.filas || 3 }, () => `<tr>${cols.map(() => `<td style="border:1px solid #ccc;padding:10px;height:26px;"></td>`).join("")}</tr>`).join("")}</tbody>
+          </table>
+        </div>`;
+      }
+      if (s.tipo === "reflexion") {
+        return `
+        <div style="background:#f0f6ff;border-left:4px solid #2563a8;padding:14px 16px;border-radius:0 10px 10px 0;margin-bottom:20px;page-break-inside:avoid;">
+          <p style="font-weight:700;font-size:13px;color:#1a3a5c;margin-bottom:10px;">💭 ${s.pregunta || "Reflexión"}</p>
+          ${Array.from({ length: 4 }, () => `<div style="border-bottom:1.5px solid #bbb;height:26px;margin-bottom:4px;"></div>`).join("")}
+        </div>`;
+      }
+      return "";
+    })
+    .join("");
+
+  const indHTML = indicadores
+    .map((i) => `<li style="margin-bottom:5px;font-size:13px;">${i}</li>`)
+    .join("");
+
+  // ── Estilos de impresión ──────────────────────────────
+  if (!document.getElementById("epad-print-style")) {
+    document.head.insertAdjacentHTML(
+      "beforeend",
+      `
+      <style id="epad-print-style">
+        @media print {
+          body > *:not(#planeaciones) { display:none!important; }
+          #planeaciones { display:block!important; }
+          .pub-nav,.site-footer,.nivel-tabs,.materias-grid,.panel-header,
+          .planeacion-form>div:not(.planeacion-preview),.btn-panel,
+          .btn-add-campo,.eval-row,.ai-spinner,#ai-bubble,
+          #scroll-progress,.trial-banner,.no-print { display:none!important; }
+          .planeacion-preview { display:block!important;opacity:1!important; }
+          .epad-print-page { page-break-after:always; }
+          @page { margin:15mm; size:A4; }
+        }
+      </style>`,
+    );
+  }
+
+  // ── RENDER FINAL ──────────────────────────────────────
+  preview.innerHTML = `
+
+  <!-- PÁGINA 1: PLANEACIÓN DIDÁCTICA -->
+  <div class="epad-print-page" style="font-family:'Inter',Arial,sans-serif;color:#1a1a1a;max-width:800px;margin:0 auto;">
+
+    <div style="border:2px solid #1a3a5c;border-radius:14px;overflow:hidden;margin-bottom:20px;">
+      <div style="background:linear-gradient(135deg,#0d1f3c,#1a3a5c);padding:20px 24px;display:flex;align-items:center;gap:18px;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#c8952a,#e8b84b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;flex-shrink:0;">EP</div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.6);">EPAD · Equipo Pedagógico de Apoyo Docente</div>
+          <div style="font-size:20px;font-weight:800;color:#fff;margin-top:2px;">Planeación Didáctica · ${nLabel}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:2px;">${matInfo?.name || ""}</div>
+        </div>
+      </div>
+      <div style="background:#f8faff;padding:14px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:2px solid #1a3a5c;">
+        ${[
+          ["👤 Docente", docente],
+          ["📚 Grado/Grupo", grado],
+          ["📅 Ciclo", ciclo],
+          ["🗓 Período", periodo || "—"],
+        ]
+          .map(
+            ([label, val]) => `
+        <div>
+          <div style="font-size:10px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:1px;">${label}</div>
+          <div style="font-size:13px;font-weight:700;color:#1a3a5c;margin-top:2px;">${val}</div>
+        </div>`,
+          )
+          .join("")}
+      </div>
+    </div>
+
+    <div style="background:#e8f0ff;border-left:5px solid #1a3a5c;padding:14px 18px;border-radius:0 10px 10px 0;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1a3a5c;margin-bottom:6px;">🎯 Propósito / Aprendizaje esperado (NEM)</div>
+      <div style="font-size:14px;line-height:1.75;">${plan.proposito_enriquecido || "—"}</div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1a3a5c;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #e0e8f5;">📋 Secuencia Didáctica</div>
+      ${actHTML}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="border:1.5px solid #27ae60;border-radius:12px;padding:14px;background:#f0fff4;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1a5c35;margin-bottom:8px;">✅ Evaluación</div>
+        <p style="font-size:13px;margin:0 0 4px;"><strong>Tipo:</strong> ${evaluacion.tipo || "—"}</p>
+        <p style="font-size:13px;margin:0 0 8px;"><strong>Instrumento:</strong> ${evaluacion.instrumento || "—"}</p>
+        ${indHTML ? `<ul style="padding-left:16px;margin:0;">${indHTML}</ul>` : ""}
+      </div>
+      <div style="border:1.5px solid #c8952a;border-radius:12px;padding:14px;background:#fff8e6;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7a4a10;margin-bottom:8px;">♿ Adecuaciones Curriculares</div>
+        ${adecuaciones.dua ? `<p style="font-size:13px;margin:0 0 6px;"><strong>DUA:</strong> ${adecuaciones.dua}</p>` : ""}
+        ${adecuaciones.nee ? `<p style="font-size:13px;margin:0;"><strong>NEE:</strong> ${adecuaciones.nee}</p>` : ""}
+      </div>
+    </div>
+
+    ${
+      plan.reflexion_docente
+        ? `
+    <div style="background:#f8f0ff;border-left:5px solid #7c3aed;padding:14px 18px;border-radius:0 10px 10px 0;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#5b21b6;margin-bottom:6px;">💡 Reflexión Docente</div>
+      <div style="font-size:13px;line-height:1.7;">${plan.reflexion_docente}</div>
+    </div>`
+        : ""
+    }
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:28px;padding-top:16px;border-top:2px solid #e0e8f5;">
+      ${["Firma del Docente", "Firma del Director(a)", "Sello Escolar"]
+        .map(
+          (label) => `
+      <div style="text-align:center;">
+        <div style="border-bottom:1.5px solid #555;height:40px;margin-bottom:6px;"></div>
+        <div style="font-size:11px;color:#555;">${label}</div>
+      </div>`,
+        )
+        .join("")}
+    </div>
+  </div>
+
+  <!-- PÁGINA 2: LISTA DE COTEJO -->
+  ${
+    listaCotejo.length
+      ? `
+  <div class="epad-print-page" style="font-family:'Inter',Arial,sans-serif;color:#1a1a1a;max-width:800px;margin:32px auto 0;">
+    <div style="border:2px solid #1a3a5c;border-radius:14px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#0d1f3c,#1a3a5c);padding:16px 24px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.6);">EPAD · Instrumento de Evaluación</div>
+        <div style="font-size:18px;font-weight:800;color:#fff;margin-top:2px;">Lista de Cotejo</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7);">${matInfo?.name || ""} · ${nLabel} · ${grado}</div>
+      </div>
+      <div style="padding:18px 20px;">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:18px;padding-bottom:14px;border-bottom:1.5px solid #e0e8f5;">
+          ${[
+            ["Nombre del alumno(a)", ""],
+            ["Fecha", ""],
+            ["Calificación", ""],
+          ]
+            .map(
+              ([label]) => `
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;margin-bottom:4px;">${label}</div>
+            <div style="border-bottom:1.5px solid #555;height:22px;"></div>
+          </div>`,
+            )
+            .join("")}
+        </div>
+        ${cotejoHTML}
+        <div style="margin-top:18px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a3a5c;margin-bottom:8px;">Observaciones del docente</div>
+          ${Array.from({ length: 3 }, () => `<div style="border-bottom:1.5px solid #bbb;height:26px;margin-bottom:6px;"></div>`).join("")}
+        </div>
+      </div>
+    </div>
+  </div>`
+      : ""
+  }
+
+  <!-- PÁGINA 3: HOJA DE TRABAJO DEL ALUMNO -->
+  ${
+    secciones.length
+      ? `
+  <div style="font-family:'Inter',Arial,sans-serif;color:#1a1a1a;max-width:800px;margin:32px auto 0;">
+    <div style="border:2px solid #2563a8;border-radius:14px;overflow:hidden;margin-bottom:20px;">
+      <div style="background:linear-gradient(135deg,#2563a8,#4a8fd4);padding:16px 24px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);">EPAD · Material de Trabajo para el Alumno</div>
+        <div style="font-size:18px;font-weight:800;color:#fff;margin-top:2px;">${hoja.titulo || "Hoja de Trabajo"}</div>
+      </div>
+      <div style="background:#f0f6ff;padding:12px 20px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;">
+        ${[
+          ["Nombre del alumno(a)", ""],
+          ["Fecha", ""],
+          ["Grado/Grupo", grado],
+        ]
+          .map(
+            ([label, val]) => `
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;margin-bottom:4px;">${label}</div>
+          ${val ? `<div style="font-size:13px;font-weight:700;color:#1a3a5c;">${val}</div>` : `<div style="border-bottom:1.5px solid #555;height:20px;"></div>`}
+        </div>`,
+          )
+          .join("")}
+      </div>
+    </div>
+    <div style="background:#fff8e6;border-left:5px solid #c8952a;padding:12px 16px;border-radius:0 10px 10px 0;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7a4a10;margin-bottom:4px;">📌 Instrucciones</div>
+      <div style="font-size:13.5px;line-height:1.6;">${hoja.instrucciones || "Lee con atención y responde cada sección."}</div>
+    </div>
+    ${seccionesHTML}
+  </div>`
+      : ""
+  }
+
+  <!-- BOTONES (ocultos al imprimir) -->
+  <div class="no-print" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;padding:20px;background:#f0f6ff;border-radius:14px;">
+    <button onclick="window.print()" style="flex:1;min-width:180px;padding:14px 24px;background:#1a3a5c;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">
+      🖨️ Imprimir todo (3 páginas)
+    </button>
+    <button onclick="generarPlaneacion('${nivel}')" style="flex:1;min-width:180px;padding:14px 24px;background:#fff;color:#1a3a5c;border:2px solid #1a3a5c;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">
+      ✨ Regenerar planeación
+    </button>
+  </div>`;
+
+  preview.classList.add("visible");
+  if (window.lucide) lucide.createIcons();
+  setTimeout(
+    () => preview.scrollIntoView({ behavior: "smooth", block: "start" }),
+    100,
+  );
+}
+// ============================================================
+// ZONA MATERIALES — CLOUDINARY (archivos) + FIRESTORE (metadata)
+// ============================================================
+
+const ZM_CLOUD_NAME = "dgvfnfyto";
+const ZM_UPLOAD_PRESET = "epad_uploads";
+const ZM_COLLECTION = "zona_materiales"; // colección Firestore
+const ZM_LS_KEY = "epad_zona_materiales"; // fallback localStorage
+
+// ── Helpers de tipo ──────────────────────────────────────────
+function zmTypeIcon(tipo) {
+  if (tipo === "video") return { emoji: "📹", label: "Video", cls: "video" };
+  if (tipo === "pdf") return { emoji: "📄", label: "PDF", cls: "pdf" };
+  return { emoji: "📎", label: "Documento", cls: "documento" };
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ── Firestore: leer / guardar / borrar ───────────────────────
+async function zmFSGetAll() {
+  try {
+    const snap = await fbDB
+      .collection(ZM_COLLECTION)
+      .orderBy("createdAt", "asc")
+      .get();
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch {
+    // fallback a localStorage si Firestore falla
+    try {
+      return JSON.parse(localStorage.getItem(ZM_LS_KEY) || "[]");
+    } catch {
+      return [];
+    }
+  }
+}
+
+async function zmFSSave(item) {
+  // item ya tiene id generado; lo usamos como doc id
+  const { id, ...data } = item;
+  await fbDB.collection(ZM_COLLECTION).doc(id).set(data);
+}
+
+async function zmFSDelete(id) {
+  await fbDB.collection(ZM_COLLECTION).doc(id).delete();
+}
+
+// ── Cache local para render rápido ──────────────────────────
+let _zmCache = null;
+
+async function zmGetAll() {
+  if (_zmCache) return _zmCache;
+  _zmCache = await zmFSGetAll();
+  return _zmCache;
+}
+
+function zmInvalidateCache() {
+  _zmCache = null;
+}
+
+// ── Subida a Cloudinary ──────────────────────────────────────
+async function zmUploadToCloudinary(file, onProgress) {
+  const url = `https://api.cloudinary.com/v1_1/${ZM_CLOUD_NAME}/auto/upload`;
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", ZM_UPLOAD_PRESET);
+  fd.append("folder", "epad_zona");
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress)
+        onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(
+          new Error(
+            "Error Cloudinary: " + xhr.status + " — " + xhr.responseText,
+          ),
+        );
+      }
+    };
+    xhr.onerror = () => reject(new Error("Error de red al subir archivo."));
+    xhr.send(fd);
+  });
+}
+
+// ── Render tarjetas ──────────────────────────────────────────
+const ZM_SUBAREAS = ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2"];
+
+function zmBuildCard(item, isAdmin) {
+  const { emoji, label, cls } = zmTypeIcon(item.tipo);
+  const subAreaNames = {
+    "1-1": "1.1 — Introducción Docente",
+    "1-2": "1.2 — Fundamentos Avanzados",
+    "2-1": "2.1 — Estrategias Activas",
+    "2-2": "2.2 — Pedagogía Digital",
+    "3-1": "3.1 — Casos Reales",
+    "3-2": "3.2 — Examen de Maestría",
+  };
+  const dateStr = item.createdAt
+    ? new Date(item.createdAt).toLocaleDateString("es-MX", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+  const accessUrl = item.cloudinaryUrl || item.url || "";
+
+  if (isAdmin) {
+    return `
+    <div class="material-card material-card-admin" id="zm-card-${item.id}">
+      <div class="material-card-top">
+        <div class="material-icon ${cls}">${emoji}</div>
+        <div class="material-info">
+          <div class="material-tipo-row">
+            <span class="material-badge material-badge-${cls}">${label}</span>
+            <span class="material-subarea-badge">📍 Subárea ${item.zona || ""}</span>
+            ${item.sourceType === "cloudinary" ? '<span class="material-subarea-badge" style="color:#27ae60;border-color:rgba(39,174,96,.3);">☁️ Cloudinary</span>' : ""}
+          </div>
+          <div class="material-titulo">${escHtml(item.titulo)}</div>
+          ${item.fileName ? `<div class="material-url-preview">📁 ${escHtml(item.fileName)}</div>` : ""}
+          ${accessUrl && !item.fileName ? `<div class="material-url-preview">🔗 ${escHtml(accessUrl.length > 55 ? accessUrl.slice(0, 55) + "…" : accessUrl)}</div>` : ""}
+          ${dateStr ? `<div class="material-date">Agregado: ${dateStr}</div>` : ""}
+        </div>
+      </div>
+      <div class="material-card-actions">
+        ${accessUrl ? `<button class="material-btn-access" onclick="window.open('${escHtml(accessUrl)}','_blank')">↗ Ver</button>` : ""}
+        <button class="material-btn-edit" onclick="zmOpenEditModal('${item.id}')">✏️ Editar</button>
+        <button class="material-btn-delete" onclick="zmDeleteMaterial('${item.id}')">🗑</button>
+      </div>
+    </div>`;
+  }
+
+  // Vista pública
+  return `
+    <div class="material-card" id="zm-card-${item.id}">
+      <div class="material-card-top">
+        <div class="material-icon ${cls}">${emoji}</div>
+        <div class="material-info">
+          <div class="material-tipo">${label}</div>
+          <div class="material-titulo">${escHtml(item.titulo)}</div>
+        </div>
+      </div>
+      <div class="material-card-actions">
+        ${accessUrl ? `<button class="material-btn-access" onclick="window.open('${escHtml(accessUrl)}','_blank')">↗ Acceder</button>` : ""}
+      </div>
+    </div>`;
+}
+
+// ── Render admin + público ───────────────────────────────────
+async function zmRenderAdmin() {
+  const items = await zmGetAll();
+  const subAreaNames = {
+    "1-1": "1.1 Introducción",
+    "1-2": "1.2 Fundamentos",
+    "2-1": "2.1 Estrategias",
+    "2-2": "2.2 Digital",
+    "3-1": "3.1 Casos Reales",
+    "3-2": "3.2 Maestría",
+  };
+  ZM_SUBAREAS.forEach((sub) => {
+    const grid = document.getElementById("zm-cards-" + sub);
+    const empty = document.getElementById("zm-empty-" + sub);
+    if (!grid || !empty) return;
+    const zone = items.filter((i) => i.zona === sub);
+    if (zone.length === 0) {
+      grid.innerHTML = "";
+      empty.style.display = "";
+    } else {
+      empty.style.display = "none";
+      grid.innerHTML = zone.map((i) => zmBuildCard(i, true)).join("");
+    }
+    // badge con conteo en tab
+    const tabBtn = document.querySelector(`.zona-tab[onclick*="'${sub}'"]`);
+    if (tabBtn) {
+      const base = subAreaNames[sub] || sub;
+      tabBtn.innerHTML =
+        zone.length > 0
+          ? `${base} <span style='background:var(--accent);color:#1a2a3a;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:4px;'>${zone.length}</span>`
+          : base;
+    }
+  });
+}
+
+async function zmRenderPublic() {
+  const items = await zmGetAll();
+  ZM_SUBAREAS.forEach((sub) => {
+    const container = document.getElementById("view-zona-" + sub);
+    if (!container) return;
+    const zone = items.filter((i) => i.zona === sub);
+    container.innerHTML =
+      zone.length === 0
+        ? ""
+        : '<div class="zona-sub-mat-grid">' +
+          zone.map((i) => zmBuildCard(i, false)).join("") +
+          "</div>";
+  });
+}
+
+// ── Estado formulario ────────────────────────────────────────
+let _zmPendingFile = null;
+let _zmCurrentSource = "url";
+
+function zmSetSource(mode) {
+  _zmCurrentSource = mode;
+  document.getElementById("zm-source-url").style.display =
+    mode === "url" ? "" : "none";
+  document.getElementById("zm-source-file").style.display =
+    mode === "file" ? "" : "none";
+  document
+    .getElementById("zm-src-url-btn")
+    .classList.toggle("active", mode === "url");
+  document
+    .getElementById("zm-src-file-btn")
+    .classList.toggle("active", mode === "file");
+}
+
+function zmFileSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 100 * 1024 * 1024) {
+    alert(
+      "El archivo supera 100 MB. Usa un enlace URL para archivos tan grandes.",
+    );
+    input.value = "";
+    return;
+  }
+  _zmPendingFile = file;
+  zmShowFilePreview(file);
+  const ext = file.name.split(".").pop().toLowerCase();
+  const tipo = document.getElementById("zm-tipo");
+  if (["mp4", "webm", "mov", "avi"].includes(ext)) tipo.value = "video";
+  else if (ext === "pdf") tipo.value = "pdf";
+  else tipo.value = "documento";
+  const tit = document.getElementById("zm-titulo");
+  if (!tit.value.trim())
+    tit.value = file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+}
+
+function zmShowFilePreview(file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const icon = ["mp4", "webm", "mov"].includes(ext)
+    ? "📹"
+    : ext === "pdf"
+      ? "📄"
+      : ["doc", "docx"].includes(ext)
+        ? "📝"
+        : ["ppt", "pptx"].includes(ext)
+          ? "📊"
+          : ["xls", "xlsx"].includes(ext)
+            ? "<i data-lucide='clipboard-list'></i>"
+            : ["png", "jpg", "jpeg", "gif"].includes(ext)
+              ? "🖼️"
+              : "📎";
+  const size =
+    file.size < 1024 * 1024
+      ? (file.size / 1024).toFixed(1) + " KB"
+      : (file.size / 1024 / 1024).toFixed(2) + " MB";
+  document.getElementById("zm-file-preview-icon").textContent = icon;
+  document.getElementById("zm-file-preview-name").textContent = file.name;
+  document.getElementById("zm-file-preview-size").textContent = size;
+  document.getElementById("zm-file-preview").style.display = "";
+  document.getElementById("zm-dropzone").style.display = "none";
+}
+
+function zmClearFile() {
+  _zmPendingFile = null;
+  document.getElementById("zm-file-input").value = "";
+  document.getElementById("zm-file-preview").style.display = "none";
+  document.getElementById("zm-dropzone").style.display = "";
+}
+
+function zmDragOver(e) {
+  e.preventDefault();
+  document.getElementById("zm-dropzone").classList.add("drag-over");
+}
+function zmDragLeave() {
+  document.getElementById("zm-dropzone").classList.remove("drag-over");
+}
+function zmDrop(e) {
+  e.preventDefault();
+  document.getElementById("zm-dropzone").classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  zmFileSelected({ files: [file], value: "" });
+  _zmPendingFile = file;
+}
+
+// ── Agregar material (URL o archivo Cloudinary) ──────────────
+async function addZonaMaterial() {
+  const titulo = (document.getElementById("zm-titulo")?.value || "").trim();
+  const tipo = document.getElementById("zm-tipo")?.value || "video";
+  const zona = document.getElementById("zm-zona")?.value || "1-1";
+  const errEl = document.getElementById("zm-error");
+  const okEl = document.getElementById("zm-success");
+  const btn = document.querySelector('[onclick="addZonaMaterial()"]');
+
+  if (errEl) errEl.style.display = "none";
+  if (okEl) okEl.style.display = "none";
+
+  if (!titulo) {
+    if (errEl) {
+      errEl.textContent = "Por favor escribe un título.";
+      errEl.style.display = "";
+    }
+    return;
+  }
+
+  // ── Modo URL ──
+  if (_zmCurrentSource === "url") {
+    const url = (document.getElementById("zm-url")?.value || "").trim();
+    if (!url) {
+      if (errEl) {
+        errEl.textContent = "Por favor pega una URL.";
+        errEl.style.display = "";
+      }
+      return;
+    }
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const item = {
+      id,
+      titulo,
+      tipo,
+      url,
+      zona,
+      sourceType: "url",
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await zmFSSave(item);
+      zmInvalidateCache();
+      document.getElementById("zm-titulo").value = "";
+      document.getElementById("zm-url").value = "";
+      await zmRenderAdmin();
+      await zmRenderPublic();
+      switchZonaTab(zona);
+      if (okEl) {
+        okEl.textContent = `✓ "${titulo}" guardado en Subárea ${zona}.`;
+        okEl.style.display = "";
+      }
+      setTimeout(() => {
+        if (okEl) okEl.style.display = "none";
+      }, 3500);
+    } catch (err) {
+      if (errEl) {
+        errEl.textContent = "Error al guardar: " + err.message;
+        errEl.style.display = "";
+      }
+    }
+    return;
+  }
+
+  // ── Modo archivo → Cloudinary ──
+  if (!_zmPendingFile) {
+    if (errEl) {
+      errEl.textContent = "Selecciona un archivo primero.";
+      errEl.style.display = "";
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Subiendo… 0%";
+  }
+
+  // Barra de progreso en dropzone
+  const dz = document.getElementById("zm-dropzone");
+  let progressBar = document.getElementById("zm-upload-progress");
+  if (!progressBar) {
+    progressBar = document.createElement("div");
+    progressBar.id = "zm-upload-progress";
+    progressBar.style.cssText =
+      "height:6px;background:var(--border);border-radius:6px;margin-top:10px;overflow:hidden;";
+    progressBar.innerHTML =
+      '<div id="zm-upload-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:6px;transition:width .2s;"></div>';
+    document.getElementById("zm-file-preview").after(progressBar);
+  }
+  progressBar.style.display = "";
+
+  try {
+    const result = await zmUploadToCloudinary(_zmPendingFile, (pct) => {
+      if (btn) btn.textContent = `Subiendo… ${pct}%`;
+      const bar = document.getElementById("zm-upload-bar");
+      if (bar) bar.style.width = pct + "%";
+    });
+
+    const id = "cld-" + Date.now().toString(36);
+    const item = {
+      id,
+      titulo,
+      tipo,
+      zona,
+      sourceType: "cloudinary",
+      cloudinaryUrl: result.secure_url,
+      publicId: result.public_id,
+      fileName: _zmPendingFile.name,
+      fileSize: _zmPendingFile.size,
+      mimeType: _zmPendingFile.type,
+      createdAt: new Date().toISOString(),
+    };
+
+    await zmFSSave(item);
+    zmInvalidateCache();
+
+    document.getElementById("zm-titulo").value = "";
+    zmClearFile();
+    progressBar.style.display = "none";
+    await zmRenderAdmin();
+    await zmRenderPublic();
+    switchZonaTab(zona);
+
+    if (okEl) {
+      okEl.textContent = `✓ "${titulo}" subido a Cloudinary y guardado.`;
+      okEl.style.display = "";
+    }
+    setTimeout(() => {
+      if (okEl) okEl.style.display = "none";
+    }, 4000);
+  } catch (err) {
+    if (errEl) {
+      errEl.textContent = "Error: " + err.message;
+      errEl.style.display = "";
+    }
+    progressBar.style.display = "none";
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "✦ Agregar material";
+    }
+  }
+}
+
+// ── Eliminar material ────────────────────────────────────────
+async function zmDeleteMaterial(id) {
+  if (!confirm("¿Eliminar este material? Esta acción no se puede deshacer."))
+    return;
+  try {
+    await zmFSDelete(id);
+    zmInvalidateCache();
+    await zmRenderAdmin();
+    await zmRenderPublic();
+    showZonaAdminToast("🗑 Material eliminado.");
+  } catch (err) {
+    alert("Error al eliminar: " + err.message);
+  }
+}
+
+// ── Tabs de subárea ──────────────────────────────────────────
+function switchZonaTab(sub, btnEl) {
+  ZM_SUBAREAS.forEach((s) => {
+    const panel = document.getElementById("zm-panel-" + s);
+    if (panel) panel.classList.toggle("active", s === sub);
+  });
+  if (btnEl) {
+    document
+      .querySelectorAll(".zona-tab")
+      .forEach((b) => b.classList.remove("active"));
+    btnEl.classList.add("active");
+  } else {
+    document.querySelectorAll(".zona-tab").forEach((b) => {
+      b.classList.toggle(
+        "active",
+        b.getAttribute("onclick")?.includes(`'${sub}'`),
+      );
+    });
+  }
+}
+
+// ── Modal Editar ─────────────────────────────────────────────
+async function zmOpenEditModal(id) {
+  const items = await zmGetAll();
+  const item = items.find((i) => i.id === id);
+  if (!item) return;
+
+  const existing = document.getElementById("zm-edit-modal-overlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "zm-edit-modal-overlay";
+  overlay.style.cssText =
+    "position:fixed;inset:0;background:rgba(10,20,40,0.65);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);";
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
+
+  const subAreaOptions = [
+    ["1-1", "1.1 — Introducción Docente"],
+    ["1-2", "1.2 — Fundamentos Avanzados"],
+    ["2-1", "2.1 — Estrategias Activas"],
+    ["2-2", "2.2 — Pedagogía Digital"],
+    ["3-1", "3.1 — Casos Reales"],
+    ["3-2", "3.2 — Examen de Maestría"],
+  ]
+    .map(
+      ([val, txt]) =>
+        `<option value="${val}" ${item.zona === val ? "selected" : ""}>${txt}</option>`,
+    )
+    .join("");
+
+  const isCloudinary = item.sourceType === "cloudinary";
+  const isFile = isCloudinary;
+
+  overlay.innerHTML = `
+    <div style='background:var(--surface);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:min(560px,95vw);max-height:90vh;overflow-y:auto;padding:28px 32px;position:relative;'>
+      <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;'>
+        <div>
+          <div style='font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;'>Zona de Aprendizaje</div>
+          <div style='font-family:'Merriweather',serif;font-size:18px;font-weight:700;color:var(--primary);'>Editar material</div>
+        </div>
+        <button onclick="document.getElementById('zm-edit-modal-overlay').remove()" style='background:var(--surface2);border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:18px;color:var(--text-muted);'>✕</button>
+      </div>
+      <div style='display:grid;gap:14px;'>
+        <div class="form-group">
+          <label class="form-label">Título *</label>
+          <input class="form-input" id="zm-edit-titulo" value="${escHtml(item.titulo)}" placeholder="Título del material" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-input" id="zm-edit-tipo">
+            <option value="video"     ${item.tipo === "video" ? "selected" : ""}>📹 Video</option>
+            <option value="pdf"       ${item.tipo === "pdf" ? "selected" : ""}>📄 PDF</option>
+            <option value="documento" ${item.tipo === "documento" ? "selected" : ""}>📎 Documento</option>
+          </select>
+        </div>
+        ${
+          !isFile
+            ? `
+        <div class="form-group">
+          <label class="form-label">URL / Enlace</label>
+          <input class="form-input" id="zm-edit-url" value="${escHtml(item.url || "")}" placeholder="https://..." />
+        </div>`
+            : `
+        <div style='background:var(--surface2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text-muted);border:1px solid var(--border);'>
+          ☁️ Archivo en Cloudinary:<br>
+          <strong style='color:var(--text-primary);'>${escHtml(item.fileName || "")}</strong><br>
+          <a href="${escHtml(item.cloudinaryUrl || "")}" target="_blank" style='color:var(--accent);font-size:11px;'>Ver archivo ↗</a>
+        </div>`
+        }
+        <div class="form-group">
+          <label class="form-label">Mover a subárea</label>
+          <select class="form-input" id="zm-edit-zona">${subAreaOptions}</select>
+        </div>
+        <div id="zm-edit-error" style='display:none;color:#e74c3c;font-size:13px;padding:8px 12px;background:rgba(231,76,60,0.08);border-radius:8px;border:1px solid rgba(231,76,60,.2);'></div>
+      </div>
+      <div style='display:flex;gap:10px;margin-top:22px;'>
+        <button onclick="zmSaveEdit('${id}')" style='flex:1;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#1a2a3a;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;'>💾 Guardar cambios</button>
+        <button onclick="document.getElementById('zm-edit-modal-overlay').remove()" style='padding:13px 20px;background:var(--surface2);color:var(--text-secondary);border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;'>Cancelar</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+
+async function zmSaveEdit(id) {
+  const items = await zmGetAll();
+  const item = items.find((i) => i.id === id);
+  if (!item) return;
+
+  const titulo = (
+    document.getElementById("zm-edit-titulo")?.value || ""
+  ).trim();
+  const tipo = document.getElementById("zm-edit-tipo")?.value || "video";
+  const zona = document.getElementById("zm-edit-zona")?.value || "1-1";
+  const urlEl = document.getElementById("zm-edit-url");
+  const url = urlEl ? urlEl.value.trim() : item.url || "";
+  const errEl = document.getElementById("zm-edit-error");
+
+  if (!titulo) {
+    if (errEl) {
+      errEl.textContent = "El título no puede estar vacío.";
+      errEl.style.display = "";
+    }
+    return;
+  }
+
+  const updated = { ...item, titulo, tipo, zona, ...(urlEl ? { url } : {}) };
+  const { id: _id, ...data } = updated;
+
+  try {
+    await fbDB.collection(ZM_COLLECTION).doc(id).update(data);
+    zmInvalidateCache();
+    await zmRenderAdmin();
+    await zmRenderPublic();
+    switchZonaTab(zona);
+    document.getElementById("zm-edit-modal-overlay")?.remove();
+    showZonaAdminToast(`✓ "${titulo}" actualizado.`);
+  } catch (err) {
+    if (errEl) {
+      errEl.textContent = "Error al guardar: " + err.message;
+      errEl.style.display = "";
+    }
+  }
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function showZonaAdminToast(msg) {
+  let t = document.getElementById("zm-admin-toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "zm-admin-toast";
+    t.style.cssText =
+      "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:13px 26px;border-radius:30px;font-size:14px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.25);transition:opacity 0.3s;pointer-events:none;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = "1";
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => {
+    t.style.opacity = "0";
+  }, 3000);
+}
+
+// ── Init ─────────────────────────────────────────────────────
+// Patch showSection
+// Patch de showSection para cargar materiales de Zona al navegar
+const _origShowSection = showSection;
+window.showSection = function (name, el) {
+  _origShowSection(name, el);
+  if (name === "zona-materiales") zmRenderAdmin();
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => zmRenderPublic());
+} else {
+  zmRenderPublic();
 }
